@@ -6545,10 +6545,10 @@ index 00000000..968cf380
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/ksud.c b/EXTRA/KernelSU/kernel/ksud.c
 new file mode 100644
-index 00000000..31381ff9
+index 00000000..2c4f2619
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/ksud.c
-@@ -0,0 +1,703 @@
+@@ -0,0 +1,736 @@
 +#include <linux/rcupdate.h>
 +#include <linux/slab.h>
 +#include <linux/task_work.h>
@@ -6856,6 +6856,39 @@ index 00000000..31381ff9
 +		return 0;
 +	}
 +
++/*	// Fix for "Bad file descriptor": Mangle KSU_FD for ANY execve from non-root //MSG123
++	// content providers / apps if they pass KSU_FD. This targets ksud invocation.
++	if (current_uid().val >= 10000 && envp) {
++		int envc = count(*envp, MAX_ARG_STRINGS);
++		if (envc > 0) {
++			int n;
++			for (n = 0; n < envc; n++) {
++				const char __user *p =
++					get_user_arg_ptr(*envp, n);
++				if (!p || IS_ERR(p))
++					continue;
++				char env[64];
++				if (ksu_strncpy_from_user_nofault(
++					    env, p, sizeof(env)) < 0)
++					continue;
++
++				if (strncmp(env, "KSU_FD=", 7) == 0) {
++					pr_info("ksu_execve: found KSU_FD in %s (uid=%d)\n",
++						filename->name,
++						current_uid().val);
++					char __user *up = (char __user *)p;
++					char mangle = '_';
++					if (copy_to_user(up, &mangle, 1)) {
++						pr_warn("ksu: failed to mangle env\n");
++					} else {
++						pr_info("ksu: mangled KSU_FD to _SU_FD\n");
++					}
++					// No break, in case multiple KSU_FDs exist (unlikely but safe)
++				}
++			}
++		}
++	}
++*/
 +	if (unlikely(!memcmp(filename->name, system_bin_init,
 +			     sizeof(system_bin_init) - 1) &&
 +		     argv)) {
@@ -11247,10 +11280,10 @@ index 00000000..b717c419
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/setuid_hook.c b/EXTRA/KernelSU/kernel/setuid_hook.c
 new file mode 100644
-index 00000000..d9a2e9d2
+index 00000000..d933005b
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/setuid_hook.c
-@@ -0,0 +1,247 @@
+@@ -0,0 +1,250 @@
 +#include <linux/compiler.h>
 +#include <linux/version.h>
 +#include <linux/slab.h>
@@ -11369,7 +11402,10 @@ index 00000000..d9a2e9d2
 +#endif
 +	if (likely(ksu_is_manager_appid_valid()) &&
 +	    unlikely(ksu_get_manager_appid() == new_uid % PER_USER_RANGE)) {
-+		disable_seccomp();
++//		disable_seccomp(); //MSG123
++		spin_lock_irq(&current->sighand->siglock); //MSG123 BEGIN
++		ksu_seccomp_allow_cache(current->seccomp.filter, __NR_reboot);
++		spin_unlock_irq(&current->sighand->siglock); // MSG123 END
 +#ifdef CONFIG_KSU_SYSCALL_HOOK
 +		ksu_set_task_tracepoint_flag(current);
 +#endif
@@ -12362,10 +12398,10 @@ index 00000000..ca99212e
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/supercalls.c b/EXTRA/KernelSU/kernel/supercalls.c
 new file mode 100644
-index 00000000..c502fcda
+index 00000000..113232bc
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/supercalls.c
-@@ -0,0 +1,1252 @@
+@@ -0,0 +1,1254 @@
 +#include <linux/anon_inodes.h>
 +#include <linux/capability.h>
 +#include <linux/cred.h>
@@ -13593,7 +13629,8 @@ index 00000000..c502fcda
 +	int fd;
 +
 +	// Get unused fd
-+	fd = get_unused_fd_flags(O_CLOEXEC);
++//	fd = get_unused_fd_flags(O_CLOEXEC);
++	fd = get_unused_fd_flags(0); //MSG123
 +	if (fd < 0) {
 +		pr_err("ksu_install_fd: failed to get unused fd\n");
 +		return fd;
@@ -13602,6 +13639,7 @@ index 00000000..c502fcda
 +	// Create anonymous inode file
 +	filp = anon_inode_getfile("[ksu_driver]", &anon_ksu_fops, NULL,
 +				  O_RDWR | O_CLOEXEC);
++//				  O_RDWR); //MSG123
 +	if (IS_ERR(filp)) {
 +		pr_err("ksu_install_fd: failed to create anon inode file\n");
 +		put_unused_fd(fd);
@@ -18462,10 +18500,10 @@ index 000000000000..81fb3a8c273a
 +
 +#endif // #ifndef KSU_SUSFS_DEF_H
 diff --git a/aosp/kernel/kallsyms.c b/aosp/kernel/kallsyms.c
-index 824bcc7b5dbc..1087f73ddca0 100644
+index 5e98cd80eed8..486a91ad09da 100644
 --- a/aosp/kernel/kallsyms.c
 +++ b/aosp/aosp/kernel/kallsyms.c
-@@ -833,6 +833,10 @@ static void s_stop(struct seq_file *m, void *p)
+@@ -836,6 +836,10 @@ static void s_stop(struct seq_file *m, void *p)
  {
  }
  
@@ -18476,7 +18514,7 @@ index 824bcc7b5dbc..1087f73ddca0 100644
  static int s_show(struct seq_file *m, void *p)
  {
  	void *value;
-@@ -856,8 +860,36 @@ static int s_show(struct seq_file *m, void *p)
+@@ -859,8 +863,36 @@ static int s_show(struct seq_file *m, void *p)
  		seq_printf(m, "%px %c %s\t[%s]\n", value,
  			   type, iter->name, iter->module_name);
  	} else
@@ -18640,12 +18678,12 @@ index 157a0367f..f41726a7a 100644
  
 +EXTRA/
 diff --git a//aosp b//aosp
-index 191059cbc..5c6495fa4 160000
+index e78e90da6..b9e7fb448 160000
 --- a//aosp
 +++ b///aosp
 @@ -1 +1 @@
--Subproject commit 191059cbc27ac1222726863e801c0ba0c13bc9fc
-+Subproject commit 5c6495fa436b7ef13e420cdcd5581d0e2dede810
+-Subproject commit e78e90da69f48c01fb7ecec247497daaef7fe59e
++Subproject commit b9e7fb448368c7e220d13932b80bcf71daf2fa34
 diff --git a//common/ack b//common/ack
 new file mode 160000
 index 000000000..d3e89d1ef
@@ -33661,7 +33699,7 @@ index 00000000..ce0a8b3d
 
 
 diff --git a/aosp/arch/arm64/configs/gki_defconfig b/aosp/arch/arm64/configs/gki_defconfig
-index 0d5e592572d6..1c4a28d65a0f 100644
+index 124b2fcd3683..4accf450f065 100644
 --- a/aosp/arch/arm64/configs/gki_defconfig
 +++ b/aosp/aosp/arch/arm64/configs/gki_defconfig
 @@ -46,7 +46,6 @@ CONFIG_BOOT_CONFIG=y
@@ -33672,7 +33710,7 @@ index 0d5e592572d6..1c4a28d65a0f 100644
  # CONFIG_RSEQ is not set
  # CONFIG_CACHESTAT_SYSCALL is not set
  CONFIG_PROFILING=y
-@@ -637,6 +636,10 @@ CONFIG_ANDROID_DEBUG_SYMBOLS=y
+@@ -638,6 +637,10 @@ CONFIG_ANDROID_DEBUG_SYMBOLS=y
  CONFIG_ANDROID_VENDOR_HOOKS=y
  CONFIG_ANDROID_DEBUG_KINFO=y
  CONFIG_LIBNVDIMM=y
@@ -34906,7 +34944,7 @@ index 4297287f6ca0..f1f2768b9c35 100644
  	/* show_fd_locks() never deferences files so a stale value is safe */
  	show_fd_locks(m, file, files);
 diff --git a/aosp/fs/proc/task_mmu.c b/aosp/fs/proc/task_mmu.c
-index e4380b37fc31..2940413cf305 100644
+index 881a6bcbb36c..ea6083093101 100644
 --- a/aosp/fs/proc/task_mmu.c
 +++ b/aosp/aosp/fs/proc/task_mmu.c
 @@ -23,6 +23,9 @@
@@ -34919,7 +34957,7 @@ index e4380b37fc31..2940413cf305 100644
  
  #include <asm/elf.h>
  #include <asm/tlb.h>
-@@ -260,6 +263,10 @@ static void show_vma_header_prefix(struct seq_file *m,
+@@ -388,6 +391,10 @@ static void show_vma_header_prefix(struct seq_file *m,
  	seq_putc(m, ' ');
  }
  
@@ -34930,7 +34968,7 @@ index e4380b37fc31..2940413cf305 100644
  static void
  show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
  {
-@@ -275,8 +282,32 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
+@@ -403,8 +410,32 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
  
  	if (file) {
  		struct inode *inode = file_inode(vma->vm_file);
@@ -34963,7 +35001,7 @@ index e4380b37fc31..2940413cf305 100644
  		pgoff = ((loff_t)vma->vm_pgoff) << PAGE_SHIFT;
  	}
  
-@@ -897,6 +928,29 @@ static int show_smap(struct seq_file *m, void *v)
+@@ -1044,6 +1075,29 @@ static int show_smap(struct seq_file *m, void *v)
  	if (!vma_pages(vma))
  		goto show_pad;
  
@@ -34993,7 +35031,7 @@ index e4380b37fc31..2940413cf305 100644
  	smap_gather_stats(vma, &mss, 0);
  
  	show_map_vma(m, vma);
-@@ -955,7 +1009,23 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
+@@ -1102,7 +1156,23 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
  
  	vma_start = vma->vm_start;
  	do {
@@ -35017,7 +35055,7 @@ index e4380b37fc31..2940413cf305 100644
  		last_vma_end = vma->vm_end;
  
  		/*
-@@ -1735,6 +1805,9 @@ static ssize_t pagemap_read(struct file *file, char __user *buf,
+@@ -1882,6 +1952,9 @@ static ssize_t pagemap_read(struct file *file, char __user *buf,
  	int ret = 0, copied = 0;
  	unsigned int nr_subpages = __PAGE_SIZE / PAGE_SIZE;
  	pagemap_entry_t *res = NULL;
@@ -35027,7 +35065,7 @@ index e4380b37fc31..2940413cf305 100644
  
  	if (!mm || !mmget_not_zero(mm))
  		goto out;
-@@ -1810,6 +1883,18 @@ static ssize_t pagemap_read(struct file *file, char __user *buf,
+@@ -1957,6 +2030,18 @@ static ssize_t pagemap_read(struct file *file, char __user *buf,
  		if (ret)
  			goto out_free;
  		ret = walk_page_range(mm, start_vaddr, end, &pagemap_ops, &pm);
@@ -37118,10 +37156,10 @@ index 000000000000..81fb3a8c273a
 +
 +#endif // #ifndef KSU_SUSFS_DEF_H
 diff --git a/aosp/kernel/kallsyms.c b/aosp/kernel/kallsyms.c
-index 18edd57b5fe8..5719b0ca344d 100644
+index 07f33601cac2..6b3c5d828add 100644
 --- a/aosp/kernel/kallsyms.c
 +++ b/aosp/aosp/kernel/kallsyms.c
-@@ -776,6 +776,10 @@ static void s_stop(struct seq_file *m, void *p)
+@@ -779,6 +779,10 @@ static void s_stop(struct seq_file *m, void *p)
  {
  }
  
@@ -37132,7 +37170,7 @@ index 18edd57b5fe8..5719b0ca344d 100644
  static int s_show(struct seq_file *m, void *p)
  {
  	void *value;
-@@ -799,8 +803,36 @@ static int s_show(struct seq_file *m, void *p)
+@@ -802,8 +806,36 @@ static int s_show(struct seq_file *m, void *p)
  		seq_printf(m, "%px %c %s\t[%s]\n", value,
  			   type, iter->name, iter->module_name);
  	} else
