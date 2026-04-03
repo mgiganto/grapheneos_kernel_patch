@@ -8,12 +8,12 @@ index 157a0367f..f41726a7a 100644
  
 +EXTRA/
 diff --git a//aosp b//aosp
-index 6a4b09d43..25cb517c9 160000
+index 8fd157b97..721cc36ce 160000
 --- a//aosp
 +++ b///aosp
 @@ -1 +1 @@
--Subproject commit 6a4b09d432cbc67e439babddc8a02d7e02ca9f87
-+Subproject commit 25cb517c9df8683f8171c0665670784bad4e8977
+-Subproject commit 8fd157b971caff4af1fc982ba12df440e270d28b
++Subproject commit 721cc36ce2abd43bd457743165beb251ce97672d
 diff --git a//common/ack b//common/ack
 new file mode 160000
 index 000000000..d3e89d1ef
