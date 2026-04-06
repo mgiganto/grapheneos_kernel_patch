@@ -2166,12 +2166,12 @@ index 157a0367f..f41726a7a 100644
  
 +EXTRA/
 diff --git a//common/ack b//common/ack
-index 1e5b7f067..8787e36fe 160000
+index 1e5b7f067..f3277c77e 160000
 --- a//common/ack
 +++ b///common/ack
 @@ -1 +1 @@
 -Subproject commit 1e5b7f067493595c1415db79725d9859b30264c0
-+Subproject commit 8787e36feb22f5d1c13f7fe86e7422178c6c5e66
++Subproject commit f3277c77e806481e4b9b14d058774cff7304a703
 
 
 diff --git a/aosp/BUILD.bazel b/aosp/BUILD.bazel
