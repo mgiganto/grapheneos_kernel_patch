@@ -7,12 +7,12 @@ index 1b12ba411..ec51a29ec 100644
  out/
 +EXTRA/
 diff --git a//common/ack b//common/ack
-index 135cf925f..3902a85bd 160000
+index b8bf78683..b137712f5 160000
 --- a//common/ack
 +++ b///common/ack
 @@ -1 +1 @@
--Subproject commit 135cf925fc8108031d96488887a18b1bb74e56dd
-+Subproject commit 3902a85bdb43172e9524fd16d4cf3d9caf6bcd09
+-Subproject commit b8bf7868302cf03483a50cc7b64c56eb72fbea9d
++Subproject commit b137712f54b30a75171930e6d1d3e362a9ead9cc
 
 
 diff --git a/EXTRA/KernelSU/.gitignore b/EXTRA/KernelSU/.gitignore
