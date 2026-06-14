@@ -6,6 +6,150 @@ index 1b12ba411..ec51a29ec 100644
  /bazel-*
  out/
 +EXTRA/
+diff --git a//private/devices/google/akita/build_akita.sh b//private/devices/google/akita/build_akita.sh
+index 4118897e8..f2eaecdc8 100755
+--- a//private/devices/google/akita/build_akita.sh
++++ b///private/devices/google/akita/build_akita.sh
+@@ -29,5 +29,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/akita/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/bluejay/build_bluejay.sh b//private/devices/google/bluejay/build_bluejay.sh
+index 6570f497c..4cf4d7949 100755
+--- a//private/devices/google/bluejay/build_bluejay.sh
++++ b///private/devices/google/bluejay/build_bluejay.sh
+@@ -14,5 +14,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/bluejay/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/caimito/build_caimito.sh b//private/devices/google/caimito/build_caimito.sh
+index 1ff65484e..6a412887d 100755
+--- a//private/devices/google/caimito/build_caimito.sh
++++ b///private/devices/google/caimito/build_caimito.sh
+@@ -29,5 +29,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/caimito/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/comet/build_comet.sh b//private/devices/google/comet/build_comet.sh
+index a2760c25f..b9247cbc0 100755
+--- a//private/devices/google/comet/build_comet.sh
++++ b///private/devices/google/comet/build_comet.sh
+@@ -29,5 +29,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/comet/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/felix/build_felix.sh b//private/devices/google/felix/build_felix.sh
+index f998ea963..96ee69ea4 100755
+--- a//private/devices/google/felix/build_felix.sh
++++ b///private/devices/google/felix/build_felix.sh
+@@ -28,5 +28,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/felix/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/lynx/build_lynx.sh b//private/devices/google/lynx/build_lynx.sh
+index 04d3fa413..3cf867d8f 100755
+--- a//private/devices/google/lynx/build_lynx.sh
++++ b///private/devices/google/lynx/build_lynx.sh
+@@ -15,5 +15,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/lynx/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/pantah/build_pantah.sh b//private/devices/google/pantah/build_pantah.sh
+index 121faa0eb..13f34bce8 100755
+--- a//private/devices/google/pantah/build_pantah.sh
++++ b///private/devices/google/pantah/build_pantah.sh
+@@ -29,5 +29,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/pantah/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/raviole/build_raviole.sh b//private/devices/google/raviole/build_raviole.sh
+index 1979aad7a..8897da4e3 100755
+--- a//private/devices/google/raviole/build_raviole.sh
++++ b///private/devices/google/raviole/build_raviole.sh
+@@ -28,5 +28,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/raviole/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/shusky/build_shusky.sh b//private/devices/google/shusky/build_shusky.sh
+index 4c15ef815..58b998455 100755
+--- a//private/devices/google/shusky/build_shusky.sh
++++ b///private/devices/google/shusky/build_shusky.sh
+@@ -29,5 +29,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/shusky/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/stallion/build_stallion.sh b//private/devices/google/stallion/build_stallion.sh
+index c0d428f4a..6f4d6f419 100755
+--- a//private/devices/google/stallion/build_stallion.sh
++++ b///private/devices/google/stallion/build_stallion.sh
+@@ -29,5 +29,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/stallion/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/tangorpro/build_tangorpro.sh b//private/devices/google/tangorpro/build_tangorpro.sh
+index 9b5051ed7..2b2f20014 100755
+--- a//private/devices/google/tangorpro/build_tangorpro.sh
++++ b///private/devices/google/tangorpro/build_tangorpro.sh
+@@ -28,5 +28,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/tangorpro/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
+diff --git a//private/devices/google/tegu/build_tegu.sh b//private/devices/google/tegu/build_tegu.sh
+index 4a81babe8..3a89dcbd1 100755
+--- a//private/devices/google/tegu/build_tegu.sh
++++ b///private/devices/google/tegu/build_tegu.sh
+@@ -29,5 +29,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
+ prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
+ find out/tegu/dist -type f -name "*.ko" \
+   -exec ${sign_file} sha256 \
+-  $(find out/ -type f -name "signing_key.pem") \
+-  $(find out/ -type f -name "signing_key.x509") {} \;
++  $(find out/ -type f -name "signing_key.pem" | head -n1) \
++  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
 
 
 diff --git a/EXTRA/KernelSU/.gitignore b/EXTRA/KernelSU/.gitignore
