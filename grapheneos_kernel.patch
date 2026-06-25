@@ -7,13 +7,6 @@ index b3e835807..8dc290e36 100644
  
  device.bazelrc
 +EXTRA/
-diff --git a//common/ack b//common/ack
-index 406976d49..bf2eec2df 160000
---- a//common/ack
-+++ b///common/ack
-@@ -1 +1 @@
--Subproject commit 406976d493eab2d232c5cbc079ca98abd105c468
-+Subproject commit bf2eec2dfa001400fc931340f2c27fc7b5e5181e
 
 
 diff --git a/aosp/arch/arm64/configs/gki_defconfig b/aosp/arch/arm64/configs/gki_defconfig
@@ -3928,5 +3921,53 @@ index d93af92498f5..b25ca19e9e64 100644
  	tclass = secclass_map[sad->tclass-1].name;
  	audit_log_format(ab, " tclass=%s", tclass);
  
+
+
+diff --git a/aosp/arch/arm64/kvm/arm.c b/aosp/arch/arm64/kvm/arm.c
+index 3c8e9d0d3574..9aa59509792e 100644
+--- a/aosp/arch/arm64/kvm/arm.c
++++ b/aosp/aosp/arch/arm64/kvm/arm.c
+@@ -22,6 +22,7 @@
+ #include <linux/sched/stat.h>
+ #include <linux/shrinker.h>
+ #include <linux/psci.h>
++#include <linux/security.h>
+ #include <trace/events/kvm.h>
+ 
+ #define CREATE_TRACE_POINTS
+@@ -2176,9 +2177,13 @@ static int __init init_subsystems(void)
+ 
+ 	kvm_register_perf_callbacks(NULL);
+ 
+-	err = hyp_trace_init_tracefs();
+-	if (err)
+-		kvm_err("Failed to initialize Hyp tracing\n");
++	if (security_locked_down(LOCKDOWN_TRACEFS)) {
++		kvm_err("Hyp tracing disabled due to lockdown\n");
++	} else {
++		err = hyp_trace_init_tracefs();
++		if (err)
++			kvm_err("Failed to initialize Hyp tracing\n");
++	}
+ out:
+ 	if (err)
+ 		hyp_cpu_pm_exit();
+diff --git a/aosp/drivers/usb/gadget/udc/core.c b/aosp/drivers/usb/gadget/udc/core.c
+index 22f0b24b6b36..4e54875d7aa9 100644
+--- a/aosp/drivers/usb/gadget/udc/core.c
++++ b/aosp/aosp/drivers/usb/gadget/udc/core.c
+@@ -714,12 +714,6 @@ static int usb_gadget_connect_locked(struct usb_gadget *gadget)
+ 		goto out;
+ 	}
+ 
+-	if (deny_new_usb) {
+-		dev_err(&gadget->dev, "blocked USB gadget connection\n");
+-		ret = -EPERM;
+-		goto out;
+-	}
+-
+ 	if (gadget->deactivated || !gadget->udc->allow_connect || !gadget->udc->started) {
+ 		/*
+ 		 * If the gadget isn't usable (because it is deactivated,
 
 
