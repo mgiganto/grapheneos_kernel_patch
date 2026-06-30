@@ -6511,10 +6511,10 @@ index 00000000..968cf380
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/ksud.c b/EXTRA/KernelSU/kernel/ksud.c
 new file mode 100644
-index 00000000..2c4f2619
+index 00000000..a48a1c97
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/ksud.c
-@@ -0,0 +1,736 @@
+@@ -0,0 +1,690 @@
 +#include <linux/rcupdate.h>
 +#include <linux/slab.h>
 +#include <linux/task_work.h>
@@ -6566,7 +6566,6 @@ index 00000000..2c4f2619
 +
 +bool ksu_module_mounted __read_mostly = false;
 +bool ksu_boot_completed __read_mostly = false;
-+static bool ksu_enabled = false; //MSG123
 +
 +static const char KERNEL_SU_RC[] =
 +	"\n"
@@ -6616,10 +6615,6 @@ index 00000000..2c4f2619
 +		return;
 +	}
 +	already_post_fs_data = true;
-+	if (!ksu_enabled) { //MSG123 BEGIN
-+		pr_info("on_post_fs_data: KSU disabled (Default state)!\n");
-+		return;
-+	} //MSG123 END
 +	pr_info("on_post_fs_data!\n");
 +	ksu_load_allow_list();
 +#if defined(CONFIG_KSU_SYSCALL_HOOK) || defined(CONFIG_KSU_SUSFS) ||           \
@@ -6822,39 +6817,6 @@ index 00000000..2c4f2619
 +		return 0;
 +	}
 +
-+/*	// Fix for "Bad file descriptor": Mangle KSU_FD for ANY execve from non-root //MSG123
-+	// content providers / apps if they pass KSU_FD. This targets ksud invocation.
-+	if (current_uid().val >= 10000 && envp) {
-+		int envc = count(*envp, MAX_ARG_STRINGS);
-+		if (envc > 0) {
-+			int n;
-+			for (n = 0; n < envc; n++) {
-+				const char __user *p =
-+					get_user_arg_ptr(*envp, n);
-+				if (!p || IS_ERR(p))
-+					continue;
-+				char env[64];
-+				if (ksu_strncpy_from_user_nofault(
-+					    env, p, sizeof(env)) < 0)
-+					continue;
-+
-+				if (strncmp(env, "KSU_FD=", 7) == 0) {
-+					pr_info("ksu_execve: found KSU_FD in %s (uid=%d)\n",
-+						filename->name,
-+						current_uid().val);
-+					char __user *up = (char __user *)p;
-+					char mangle = '_';
-+					if (copy_to_user(up, &mangle, 1)) {
-+						pr_warn("ksu: failed to mangle env\n");
-+					} else {
-+						pr_info("ksu: mangled KSU_FD to _SU_FD\n");
-+					}
-+					// No break, in case multiple KSU_FDs exist (unlikely but safe)
-+				}
-+			}
-+		}
-+	}
-+*/
 +	if (unlikely(!memcmp(filename->name, system_bin_init,
 +			     sizeof(system_bin_init) - 1) &&
 +		     argv)) {
@@ -6964,10 +6926,6 @@ index 00000000..2c4f2619
 +{
 +	ssize_t ret = 0;
 +	size_t append_count;
-+
-+	if (!ksu_enabled) //MSG123
-+		return orig_read(file, buf, count, pos); //MSG123
-+
 +	if (ksu_rc_pos && ksu_rc_pos < ksu_rc_len)
 +		goto append_ksu_rc;
 +
@@ -7157,10 +7115,6 @@ index 00000000..2c4f2619
 +	}
 +#endif // #ifndef CONFIG_KSU_SUSFS
 +
-+	if (*type == EV_KEY && *code == KEY_VOLUMEUP && *value) { //MSG123 BEGIN
-+		pr_info("ksu: Volume UP detected, ENABLING KernelSU!\n");
-+		ksu_enabled = true;
-+	} //MSG123 END
 +	if (*type == EV_KEY && *code == KEY_VOLUMEDOWN && *value) {
 +		// key pressed, count it
 +		volumedown_pressed_count++;
@@ -11246,10 +11200,10 @@ index 00000000..b717c419
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/setuid_hook.c b/EXTRA/KernelSU/kernel/setuid_hook.c
 new file mode 100644
-index 00000000..d933005b
+index 00000000..d9a2e9d2
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/setuid_hook.c
-@@ -0,0 +1,250 @@
+@@ -0,0 +1,247 @@
 +#include <linux/compiler.h>
 +#include <linux/version.h>
 +#include <linux/slab.h>
@@ -11368,10 +11322,7 @@ index 00000000..d933005b
 +#endif
 +	if (likely(ksu_is_manager_appid_valid()) &&
 +	    unlikely(ksu_get_manager_appid() == new_uid % PER_USER_RANGE)) {
-+//		disable_seccomp(); //MSG123
-+		spin_lock_irq(&current->sighand->siglock); //MSG123 BEGIN
-+		ksu_seccomp_allow_cache(current->seccomp.filter, __NR_reboot);
-+		spin_unlock_irq(&current->sighand->siglock); // MSG123 END
++		disable_seccomp();
 +#ifdef CONFIG_KSU_SYSCALL_HOOK
 +		ksu_set_task_tracepoint_flag(current);
 +#endif
@@ -12364,10 +12315,10 @@ index 00000000..ca99212e
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/supercalls.c b/EXTRA/KernelSU/kernel/supercalls.c
 new file mode 100644
-index 00000000..113232bc
+index 00000000..c502fcda
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/supercalls.c
-@@ -0,0 +1,1254 @@
+@@ -0,0 +1,1252 @@
 +#include <linux/anon_inodes.h>
 +#include <linux/capability.h>
 +#include <linux/cred.h>
@@ -13595,8 +13546,7 @@ index 00000000..113232bc
 +	int fd;
 +
 +	// Get unused fd
-+//	fd = get_unused_fd_flags(O_CLOEXEC);
-+	fd = get_unused_fd_flags(0); //MSG123
++	fd = get_unused_fd_flags(O_CLOEXEC);
 +	if (fd < 0) {
 +		pr_err("ksu_install_fd: failed to get unused fd\n");
 +		return fd;
@@ -13605,7 +13555,6 @@ index 00000000..113232bc
 +	// Create anonymous inode file
 +	filp = anon_inode_getfile("[ksu_driver]", &anon_ksu_fops, NULL,
 +				  O_RDWR | O_CLOEXEC);
-+//				  O_RDWR); //MSG123
 +	if (IS_ERR(filp)) {
 +		pr_err("ksu_install_fd: failed to create anon inode file\n");
 +		put_unused_fd(fd);
