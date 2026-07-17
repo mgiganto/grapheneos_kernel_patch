@@ -49,7 +49,7 @@ index 01211c5d8..beb996111 100755
 
 
 diff --git a/aosp/arch/arm64/kvm/arm.c b/aosp/arch/arm64/kvm/arm.c
-index 3c8e9d0d3574..9aa59509792e 100644
+index 772a2847a8a5..5cd1f10a8ae2 100644
 --- a/aosp/arch/arm64/kvm/arm.c
 +++ b/aosp/aosp/arch/arm64/kvm/arm.c
 @@ -22,6 +22,7 @@
@@ -60,7 +60,7 @@ index 3c8e9d0d3574..9aa59509792e 100644
  #include <trace/events/kvm.h>
  
  #define CREATE_TRACE_POINTS
-@@ -2176,9 +2177,13 @@ static int __init init_subsystems(void)
+@@ -2181,9 +2182,13 @@ static int __init init_subsystems(void)
  
  	kvm_register_perf_callbacks(NULL);
  
