@@ -14110,7 +14110,7 @@ index 00000000..762625a6
 
 
 diff --git a/aosp/arch/arm64/configs/gki_defconfig b/aosp/arch/arm64/configs/gki_defconfig
-index c054c9d05ffa..60ee0eca2731 100644
+index 27022d59999e..13c4c7fbe15a 100644
 --- a/aosp/arch/arm64/configs/gki_defconfig
 +++ b/aosp/aosp/arch/arm64/configs/gki_defconfig
 @@ -46,7 +46,6 @@ CONFIG_BOOT_CONFIG=y
@@ -14121,7 +14121,7 @@ index c054c9d05ffa..60ee0eca2731 100644
  # CONFIG_RSEQ is not set
  # CONFIG_CACHESTAT_SYSCALL is not set
  CONFIG_PROFILING=y
-@@ -640,6 +639,7 @@ CONFIG_ANDROID_VENDOR_HOOKS=y
+@@ -641,6 +640,7 @@ CONFIG_ANDROID_VENDOR_HOOKS=y
  CONFIG_ANDROID_DEBUG_KINFO=y
  CONFIG_ANDROID_WRAPFD=y
  CONFIG_LIBNVDIMM=y
@@ -15192,7 +15192,7 @@ index 0641cb3fdd6b..d3320f2809bc 100644
  			put_unused_fd(fd);
  			fd = PTR_ERR(f);
 diff --git a/aosp/fs/proc/base.c b/aosp/fs/proc/base.c
-index 0588a40a7b4a..b91e82b0e122 100644
+index 9d71d2facce5..9586ae3cbb5d 100644
 --- a/aosp/fs/proc/base.c
 +++ b/aosp/aosp/fs/proc/base.c
 @@ -101,6 +101,10 @@
@@ -18321,7 +18321,7 @@ index 8e40b0941d1c..629658620f89 100644
  	audit_log_format(ab, " tclass=%s", tclass);
  
 diff --git a/aosp/security/selinux/hooks.c b/aosp/security/selinux/hooks.c
-index 49ec24f741e3..1d4aefe47d84 100644
+index 27d760e3931d..321311098019 100644
 --- a/aosp/security/selinux/hooks.c
 +++ b/aosp/aosp/security/selinux/hooks.c
 @@ -107,6 +107,12 @@
@@ -18337,7 +18337,7 @@ index 49ec24f741e3..1d4aefe47d84 100644
  
  /* SECMARK reference count */
  static atomic_t selinux_secmark_refcount = ATOMIC_INIT(0);
-@@ -6742,6 +6748,41 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
+@@ -6757,6 +6763,41 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
  	return error;
  }
  
@@ -18379,7 +18379,7 @@ index 49ec24f741e3..1d4aefe47d84 100644
  static int selinux_ismaclabel(const char *name)
  {
  	return (strcmp(name, XATTR_SELINUX_SUFFIX) == 0);
-@@ -7367,7 +7408,11 @@ static struct security_hook_list selinux_hooks[] __ro_after_init = {
+@@ -7382,7 +7423,11 @@ static struct security_hook_list selinux_hooks[] __ro_after_init = {
  	LSM_HOOK_INIT(d_instantiate, selinux_d_instantiate),
  
  	LSM_HOOK_INIT(getprocattr, selinux_getprocattr),
