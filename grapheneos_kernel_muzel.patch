@@ -15066,7 +15066,7 @@ index 1aa7de55094c..b8e45259098e 100644
  			   inode_mark->wd, inode->i_ino, inode->i_sb->s_dev,
  			   inotify_mark_user_mask(mark));
 diff --git a/aosp/fs/open.c b/aosp/fs/open.c
-index 0641cb3fdd6b..d3320f2809bc 100644
+index b799e77848ee..5a4e3e160389 100644
 --- a/aosp/fs/open.c
 +++ b/aosp/aosp/fs/open.c
 @@ -34,6 +34,9 @@
@@ -15112,7 +15112,7 @@ index 0641cb3fdd6b..d3320f2809bc 100644
  	if (mode & ~S_IRWXO)	/* where's F_OK, X_OK, W_OK, R_OK? */
  		return -EINVAL;
  
-@@ -1425,12 +1447,20 @@ struct file *file_open_root(const struct path *root,
+@@ -1426,12 +1448,20 @@ struct file *file_open_root(const struct path *root,
  }
  EXPORT_SYMBOL(file_open_root);
  
@@ -15133,7 +15133,7 @@ index 0641cb3fdd6b..d3320f2809bc 100644
  
  	if (fd)
  		return fd;
-@@ -1440,8 +1470,28 @@ static long do_sys_openat2(int dfd, const char __user *filename,
+@@ -1441,8 +1471,28 @@ static long do_sys_openat2(int dfd, const char __user *filename,
  		return PTR_ERR(tmp);
  
  	fd = get_unused_fd_flags(how->flags);
@@ -18292,7 +18292,7 @@ index 8e40b0941d1c..629658620f89 100644
  	audit_log_format(ab, " tclass=%s", tclass);
  
 diff --git a/aosp/security/selinux/hooks.c b/aosp/security/selinux/hooks.c
-index 27d760e3931d..321311098019 100644
+index a20af1b21ae2..3baa9bb6ff04 100644
 --- a/aosp/security/selinux/hooks.c
 +++ b/aosp/aosp/security/selinux/hooks.c
 @@ -107,6 +107,12 @@
@@ -18308,7 +18308,7 @@ index 27d760e3931d..321311098019 100644
  
  /* SECMARK reference count */
  static atomic_t selinux_secmark_refcount = ATOMIC_INIT(0);
-@@ -6757,6 +6763,41 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
+@@ -6867,6 +6873,41 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
  	return error;
  }
  
@@ -18350,7 +18350,7 @@ index 27d760e3931d..321311098019 100644
  static int selinux_ismaclabel(const char *name)
  {
  	return (strcmp(name, XATTR_SELINUX_SUFFIX) == 0);
-@@ -7382,7 +7423,11 @@ static struct security_hook_list selinux_hooks[] __ro_after_init = {
+@@ -7495,7 +7536,11 @@ static struct security_hook_list selinux_hooks[] __ro_after_init = {
  	LSM_HOOK_INIT(d_instantiate, selinux_d_instantiate),
  
  	LSM_HOOK_INIT(getprocattr, selinux_getprocattr),
