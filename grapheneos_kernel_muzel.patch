@@ -14478,7 +14478,7 @@ index 00000000..762625a6
 
 
 diff --git a/aosp/arch/arm64/configs/gki_defconfig b/aosp/arch/arm64/configs/gki_defconfig
-index 27022d59999e..13c4c7fbe15a 100644
+index 19658ac38b25..8d466ee35114 100644
 --- a/aosp/arch/arm64/configs/gki_defconfig
 +++ b/aosp/aosp/arch/arm64/configs/gki_defconfig
 @@ -46,7 +46,6 @@ CONFIG_BOOT_CONFIG=y
@@ -14489,9 +14489,9 @@ index 27022d59999e..13c4c7fbe15a 100644
  # CONFIG_RSEQ is not set
  # CONFIG_CACHESTAT_SYSCALL is not set
  CONFIG_PROFILING=y
-@@ -641,6 +640,7 @@ CONFIG_ANDROID_VENDOR_HOOKS=y
+@@ -640,6 +639,7 @@ CONFIG_ANDROID_DEBUG_SYMBOLS=y
+ CONFIG_ANDROID_VENDOR_HOOKS=y
  CONFIG_ANDROID_DEBUG_KINFO=y
- CONFIG_ANDROID_WRAPFD=y
  CONFIG_LIBNVDIMM=y
 +CONFIG_KPM=y
  CONFIG_EXT4_FS=y
@@ -14661,7 +14661,7 @@ index c6963a9a4d0a..e27ac368bbb4 100644
  obj-$(CONFIG_PROC_FS)		+= proc_namespace.o
  obj-$(CONFIG_LEGACY_DIRECT_IO)	+= direct-io.o
 diff --git a/aosp/fs/exec.c b/aosp/fs/exec.c
-index 1baa51dabab2..951ff6ab4232 100644
+index 8d780bc381ed..737df3bbaafc 100644
 --- a/aosp/fs/exec.c
 +++ b/aosp/aosp/fs/exec.c
 @@ -68,6 +68,9 @@
@@ -14674,7 +14674,7 @@ index 1baa51dabab2..951ff6ab4232 100644
  
  #ifndef __GENKSYMS__
  #include <linux/dma-buf.h>
-@@ -1929,6 +1932,18 @@ static int bprm_execve(struct linux_binprm *bprm,
+@@ -1942,6 +1945,18 @@ static int bprm_execve(struct linux_binprm *bprm,
  	return retval;
  }
  
@@ -14693,7 +14693,7 @@ index 1baa51dabab2..951ff6ab4232 100644
  static int do_execveat_common(int fd, struct filename *filename,
  			      struct user_arg_ptr argv,
  			      struct user_arg_ptr envp,
-@@ -1936,10 +1951,28 @@ static int do_execveat_common(int fd, struct filename *filename,
+@@ -1949,10 +1964,28 @@ static int do_execveat_common(int fd, struct filename *filename,
  {
  	struct linux_binprm *bprm;
  	int retval;
@@ -14722,7 +14722,7 @@ index 1baa51dabab2..951ff6ab4232 100644
  	/*
  	 * We move the actual failure in case of RLIMIT_NPROC excess from
  	 * set*uid() to execve() because too many poorly written programs
-@@ -2010,6 +2043,10 @@ static int do_execveat_common(int fd, struct filename *filename,
+@@ -2023,6 +2056,10 @@ static int do_execveat_common(int fd, struct filename *filename,
  	}
  
  	retval = bprm_execve(bprm, fd, filename, flags);
@@ -18984,7 +18984,7 @@ index 8e40b0941d1c..629658620f89 100644
  	audit_log_format(ab, " tclass=%s", tclass);
  
 diff --git a/aosp/security/selinux/hooks.c b/aosp/security/selinux/hooks.c
-index a20af1b21ae2..3baa9bb6ff04 100644
+index b1cf6ef6e17d..36f386e00f0c 100644
 --- a/aosp/security/selinux/hooks.c
 +++ b/aosp/aosp/security/selinux/hooks.c
 @@ -107,6 +107,12 @@
@@ -19000,7 +19000,7 @@ index a20af1b21ae2..3baa9bb6ff04 100644
  
  /* SECMARK reference count */
  static atomic_t selinux_secmark_refcount = ATOMIC_INIT(0);
-@@ -6867,6 +6873,41 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
+@@ -6868,6 +6874,41 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
  	return error;
  }
  
@@ -19042,7 +19042,7 @@ index a20af1b21ae2..3baa9bb6ff04 100644
  static int selinux_ismaclabel(const char *name)
  {
  	return (strcmp(name, XATTR_SELINUX_SUFFIX) == 0);
-@@ -7495,7 +7536,11 @@ static struct security_hook_list selinux_hooks[] __ro_after_init = {
+@@ -7496,7 +7537,11 @@ static struct security_hook_list selinux_hooks[] __ro_after_init = {
  	LSM_HOOK_INIT(d_instantiate, selinux_d_instantiate),
  
  	LSM_HOOK_INIT(getprocattr, selinux_getprocattr),

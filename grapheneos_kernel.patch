@@ -14478,7 +14478,7 @@ index 00000000..762625a6
 
 
 diff --git a/aosp/arch/arm64/configs/gki_defconfig b/aosp/arch/arm64/configs/gki_defconfig
-index 630dac0948e6..e404d56272b7 100644
+index c39574a6940d..f156375d2445 100644
 --- a/aosp/arch/arm64/configs/gki_defconfig
 +++ b/aosp/aosp/arch/arm64/configs/gki_defconfig
 @@ -41,7 +41,6 @@ CONFIG_RT_SOFTIRQ_AWARE_SCHED=y
@@ -14644,7 +14644,7 @@ index 102e4cd2bf69..a1929dbc8b8c 100644
  obj-y +=	buffer.o direct-io.o mpage.o
  else
 diff --git a/aosp/fs/exec.c b/aosp/fs/exec.c
-index 9b1ee5293caa..955a5dca51a6 100644
+index 1a49048140a1..c30c4d715987 100644
 --- a/aosp/fs/exec.c
 +++ b/aosp/aosp/fs/exec.c
 @@ -65,6 +65,9 @@
@@ -14657,7 +14657,7 @@ index 9b1ee5293caa..955a5dca51a6 100644
  
  #ifndef __GENKSYMS__
  #include <linux/dma-buf.h>
-@@ -1907,6 +1910,18 @@ static int bprm_execve(struct linux_binprm *bprm,
+@@ -1920,6 +1923,18 @@ static int bprm_execve(struct linux_binprm *bprm,
  	return retval;
  }
  
@@ -14676,7 +14676,7 @@ index 9b1ee5293caa..955a5dca51a6 100644
  static int do_execveat_common(int fd, struct filename *filename,
  			      struct user_arg_ptr argv,
  			      struct user_arg_ptr envp,
-@@ -1914,10 +1929,28 @@ static int do_execveat_common(int fd, struct filename *filename,
+@@ -1927,10 +1942,28 @@ static int do_execveat_common(int fd, struct filename *filename,
  {
  	struct linux_binprm *bprm;
  	int retval;
@@ -14705,7 +14705,7 @@ index 9b1ee5293caa..955a5dca51a6 100644
  	/*
  	 * We move the actual failure in case of RLIMIT_NPROC excess from
  	 * set*uid() to execve() because too many poorly written programs
-@@ -1988,6 +2021,10 @@ static int do_execveat_common(int fd, struct filename *filename,
+@@ -2001,6 +2034,10 @@ static int do_execveat_common(int fd, struct filename *filename,
  	}
  
  	retval = bprm_execve(bprm, fd, filename, flags);
@@ -15676,7 +15676,7 @@ index 82d10b7a57da..74d26534d1bd 100644
  		goto out;
  
 diff --git a/aosp/fs/proc/base.c b/aosp/fs/proc/base.c
-index 802e32943622..53421f621821 100644
+index 79b7aff63046..6893c5d6afa7 100644
 --- a/aosp/fs/proc/base.c
 +++ b/aosp/aosp/fs/proc/base.c
 @@ -100,6 +100,10 @@
@@ -15690,7 +15690,7 @@ index 802e32943622..53421f621821 100644
  #include <trace/events/oom.h>
  #include <trace/hooks/sched.h>
  #include "internal.h"
-@@ -1835,6 +1839,10 @@ static const char *proc_pid_get_link(struct dentry *dentry,
+@@ -1829,6 +1833,10 @@ static const char *proc_pid_get_link(struct dentry *dentry,
  	return ERR_PTR(error);
  }
  
@@ -15701,7 +15701,7 @@ index 802e32943622..53421f621821 100644
  static int do_proc_readlink(const struct path *path, char __user *buffer, int buflen)
  {
  	char *tmp = kmalloc(PATH_MAX, GFP_KERNEL);
-@@ -1844,6 +1852,18 @@ static int do_proc_readlink(const struct path *path, char __user *buffer, int bu
+@@ -1838,6 +1846,18 @@ static int do_proc_readlink(const struct path *path, char __user *buffer, int bu
  	if (!tmp)
  		return -ENOMEM;
  
@@ -15720,7 +15720,7 @@ index 802e32943622..53421f621821 100644
  	pathname = d_path(path, tmp, PATH_MAX);
  	len = PTR_ERR(pathname);
  	if (IS_ERR(pathname))
-@@ -2466,6 +2486,10 @@ proc_map_files_readdir(struct file *file, struct dir_context *ctx)
+@@ -2446,6 +2466,10 @@ proc_map_files_readdir(struct file *file, struct dir_context *ctx)
  	for_each_vma(vmi, vma) {
  		if (!vma->vm_file)
  			continue;
@@ -15758,7 +15758,7 @@ index 2e244ada1f97..ca76c06d0bbf 100644
  		seq_puts(m, saved_boot_config);
  	return 0;
 diff --git a/aosp/fs/proc/fd.c b/aosp/fs/proc/fd.c
-index 913bef0d2a36..f9a192b3751a 100644
+index 9e2cc705cb65..bbf9c1ed2471 100644
 --- a/aosp/fs/proc/fd.c
 +++ b/aosp/aosp/fs/proc/fd.c
 @@ -13,11 +13,22 @@
@@ -18944,7 +18944,7 @@ index d93af92498f5..0e31fe21ec72 100644
  	audit_log_format(ab, " tclass=%s", tclass);
  
 diff --git a/aosp/security/selinux/hooks.c b/aosp/security/selinux/hooks.c
-index bad7579d77f0..2b7a7df52d46 100644
+index fc48b51bd1b2..d0f01af9f8ed 100644
 --- a/aosp/security/selinux/hooks.c
 +++ b/aosp/aosp/security/selinux/hooks.c
 @@ -105,6 +105,10 @@
@@ -18958,7 +18958,7 @@ index bad7579d77f0..2b7a7df52d46 100644
  
  /* SECMARK reference count */
  static atomic_t selinux_secmark_refcount = ATOMIC_INIT(0);
-@@ -6839,6 +6843,43 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
+@@ -6857,6 +6861,43 @@ static int selinux_setprocattr(const char *name, void *value, size_t size)
  	return error;
  }
  
@@ -19002,7 +19002,7 @@ index bad7579d77f0..2b7a7df52d46 100644
  static int selinux_ismaclabel(const char *name)
  {
  	return (strcmp(name, XATTR_SELINUX_SUFFIX) == 0);
-@@ -7474,7 +7515,11 @@ static struct security_hook_list selinux_hooks[] __lsm_ro_after_init = {
+@@ -7492,7 +7533,11 @@ static struct security_hook_list selinux_hooks[] __lsm_ro_after_init = {
  	LSM_HOOK_INIT(d_instantiate, selinux_d_instantiate),
  
  	LSM_HOOK_INIT(getprocattr, selinux_getprocattr),
