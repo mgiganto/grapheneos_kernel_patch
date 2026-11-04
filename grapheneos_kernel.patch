@@ -7,6 +7,13 @@ index b3e835807..8dc290e36 100644
  
  device.bazelrc
 +EXTRA/
+diff --git a//common/ack b//common/ack
+index ae67dbef0..d33819868 160000
+--- a//common/ack
++++ b///common/ack
+@@ -1 +1 @@
+-Subproject commit ae67dbef00c84298cbc93fa080e695dd96e7e583
++Subproject commit d3381986817605762253233c3d2de680fc0c0188
 diff --git a//private/devices/google/common/tools/build_dist.sh b//private/devices/google/common/tools/build_dist.sh
 index 2e77e7ca8..4e5cf5ada 100755
 --- a//private/devices/google/common/tools/build_dist.sh
