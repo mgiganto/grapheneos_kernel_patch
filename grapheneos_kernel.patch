@@ -7,6 +7,13 @@ index b3e835807..8dc290e36 100644
  
  device.bazelrc
 +EXTRA/
+diff --git a//common/ack b//common/ack
+index ae67dbef0..d33819868 160000
+--- a//common/ack
++++ b///common/ack
+@@ -1 +1 @@
+-Subproject commit ae67dbef00c84298cbc93fa080e695dd96e7e583
++Subproject commit d3381986817605762253233c3d2de680fc0c0188
 diff --git a//private/devices/google/common/tools/build_dist.sh b//private/devices/google/common/tools/build_dist.sh
 index 2e77e7ca8..4e5cf5ada 100755
 --- a//private/devices/google/common/tools/build_dist.sh
@@ -14497,6 +14504,23 @@ index c39574a6940d..f156375d2445 100644
  CONFIG_EXT4_FS=y
  CONFIG_EXT4_FS_POSIX_ACL=y
  CONFIG_EXT4_FS_SECURITY=y
+diff --git a/aosp/block/blk-crypto-fallback.c b/aosp/block/blk-crypto-fallback.c
+index 8bc8f56d404f..9cbb71e5852b 100644
+--- a/aosp/block/blk-crypto-fallback.c
++++ b/aosp/aosp/block/blk-crypto-fallback.c
+@@ -531,12 +531,6 @@ bool blk_crypto_fallback_bio_prep(struct bio **bio_ptr)
+ 
+ int blk_crypto_fallback_evict_key(const struct blk_crypto_key *key)
+ {
+-	/*
+-	 * Pairs with smp_store_release() in
+-	 * blk_crypto_fallback_start_using_mode()
+-	 */
+-	if (!smp_load_acquire(&tfms_inited[key->crypto_cfg.crypto_mode]))
+-		return 0;
+ 	return __blk_crypto_evict_key(blk_crypto_fallback_profile, key);
+ }
+ 
 diff --git a/aosp/drivers/Kconfig b/aosp/drivers/Kconfig
 index 19ee995bd0ae..cf68b538d592 100644
 --- a/aosp/drivers/Kconfig
@@ -14517,6 +14541,140 @@ index bdf1c66141c9..d69d75d156d6 100644
  obj-$(CONFIG_HTE)		+= hte/
 +
 +obj-$(CONFIG_KSU) += kernelsu/
+diff --git a/aosp/drivers/hid/hid-core.c b/aosp/drivers/hid/hid-core.c
+index 14d4f884640e..fb7d77caa935 100644
+--- a/aosp/drivers/hid/hid-core.c
++++ b/aosp/aosp/drivers/hid/hid-core.c
+@@ -2079,36 +2079,14 @@ EXPORT_SYMBOL_GPL(hid_report_raw_event);
+  * @interrupt: distinguish between interrupt and control transfers
+  *
+  * This is data entry for lower layers.
+- * Legacy, please use hid_safe_input_report() instead.
+  */
+ int hid_input_report(struct hid_device *hid, enum hid_report_type type, u8 *data,
+ 		     u32 size, int interrupt)
+-{
+-	return hid_safe_input_report(hid, type, data, size, size, interrupt);
+-}
+-EXPORT_SYMBOL_GPL(hid_input_report);
+-
+-/**
+- * hid_safe_input_report - report data from lower layer (usb, bt...)
+- *
+- * @hid: hid device
+- * @type: HID report type (HID_*_REPORT)
+- * @data: report contents
+- * @bufsize: allocated size of the data buffer
+- * @size: useful size of data parameter
+- * @interrupt: distinguish between interrupt and control transfers
+- *
+- * This is data entry for lower layers.
+- * Please use this function instead of the non safe version because we provide
+- * here the size of the buffer, allowing hid-core to make smarter decisions
+- * regarding the incoming buffer.
+- */
+-int hid_safe_input_report(struct hid_device *hid, enum hid_report_type type, u8 *data,
+-			  size_t bufsize, u32 size, int interrupt)
+ {
+ 	struct hid_report_enum *report_enum;
+ 	struct hid_driver *hdrv;
+ 	struct hid_report *report;
++	size_t bufsize = size;
+ 	int ret = 0;
+ 
+ 	if (!hid)
+@@ -2153,7 +2131,7 @@ int hid_safe_input_report(struct hid_device *hid, enum hid_report_type type, u8
+ 	up(&hid->driver_input_lock);
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(hid_safe_input_report);
++EXPORT_SYMBOL_GPL(hid_input_report);
+ 
+ bool hid_match_one_id(const struct hid_device *hdev,
+ 		      const struct hid_device_id *id)
+@@ -2698,8 +2676,6 @@ static int hid_device_probe(struct device *dev)
+ 				ret = hid_hw_start(hdev, HID_CONNECT_DEFAULT);
+ 		}
+ 		if (ret) {
+-			if (hdev->io_started)
+-				hid_device_io_stop(hdev);
+ 			hid_close_report(hdev);
+ 			hdev->driver = NULL;
+ 		}
+diff --git a/aosp/drivers/hid/i2c-hid/i2c-hid-core.c b/aosp/drivers/hid/i2c-hid/i2c-hid-core.c
+index ca66f39eec81..624d542df3a7 100644
+--- a/aosp/drivers/hid/i2c-hid/i2c-hid-core.c
++++ b/aosp/aosp/drivers/hid/i2c-hid/i2c-hid-core.c
+@@ -552,10 +552,9 @@ static void i2c_hid_get_input(struct i2c_hid *ihid)
+ 		if (ihid->hid->group != HID_GROUP_RMI)
+ 			pm_wakeup_event(&ihid->client->dev, 0);
+ 
+-		hid_safe_input_report(ihid->hid, HID_INPUT_REPORT,
+-				      ihid->inbuf + sizeof(__le16),
+-				      ihid->bufsize - sizeof(__le16),
+-				      ret_size - sizeof(__le16), 1);
++		hid_input_report(ihid->hid, HID_INPUT_REPORT,
++				ihid->inbuf + sizeof(__le16),
++				ret_size - sizeof(__le16), 1);
+ 	}
+ 
+ 	return;
+diff --git a/aosp/drivers/hid/uhid.c b/aosp/drivers/hid/uhid.c
+index b84fd5eafb9e..2a918aeb0af1 100644
+--- a/aosp/drivers/hid/uhid.c
++++ b/aosp/aosp/drivers/hid/uhid.c
+@@ -596,8 +596,8 @@ static int uhid_dev_input(struct uhid_device *uhid, struct uhid_event *ev)
+ 	if (!READ_ONCE(uhid->running))
+ 		return -EINVAL;
+ 
+-	hid_safe_input_report(uhid->hid, HID_INPUT_REPORT, ev->u.input.data, UHID_DATA_MAX,
+-			      min_t(size_t, ev->u.input.size, UHID_DATA_MAX), 0);
++	hid_input_report(uhid->hid, HID_INPUT_REPORT, ev->u.input.data,
++			 min_t(size_t, ev->u.input.size, UHID_DATA_MAX), 0);
+ 
+ 	return 0;
+ }
+@@ -607,8 +607,8 @@ static int uhid_dev_input2(struct uhid_device *uhid, struct uhid_event *ev)
+ 	if (!READ_ONCE(uhid->running))
+ 		return -EINVAL;
+ 
+-	hid_safe_input_report(uhid->hid, HID_INPUT_REPORT, ev->u.input2.data, UHID_DATA_MAX,
+-			      min_t(size_t, ev->u.input2.size, UHID_DATA_MAX), 0);
++	hid_input_report(uhid->hid, HID_INPUT_REPORT, ev->u.input2.data,
++			 min_t(size_t, ev->u.input2.size, UHID_DATA_MAX), 0);
+ 
+ 	return 0;
+ }
+diff --git a/aosp/drivers/hid/usbhid/hid-core.c b/aosp/drivers/hid/usbhid/hid-core.c
+index 3bfca6c3b528..ccf0aad99a4b 100644
+--- a/aosp/drivers/hid/usbhid/hid-core.c
++++ b/aosp/aosp/drivers/hid/usbhid/hid-core.c
+@@ -281,9 +281,9 @@ static void hid_irq_in(struct urb *urb)
+ 			break;
+ 		usbhid_mark_busy(usbhid);
+ 		if (!test_bit(HID_RESUME_RUNNING, &usbhid->iofl)) {
+-			hid_safe_input_report(urb->context, HID_INPUT_REPORT,
+-					      urb->transfer_buffer, urb->transfer_buffer_length,
+-					      urb->actual_length, 1);
++			hid_input_report(urb->context, HID_INPUT_REPORT,
++					 urb->transfer_buffer,
++					 urb->actual_length, 1);
+ 			/*
+ 			 * autosuspend refused while keys are pressed
+ 			 * because most keyboards don't wake up when
+@@ -480,10 +480,9 @@ static void hid_ctrl(struct urb *urb)
+ 	switch (status) {
+ 	case 0:			/* success */
+ 		if (usbhid->ctrl[usbhid->ctrltail].dir == USB_DIR_IN)
+-			hid_safe_input_report(urb->context,
++			hid_input_report(urb->context,
+ 				usbhid->ctrl[usbhid->ctrltail].report->type,
+-				urb->transfer_buffer, urb->transfer_buffer_length,
+-				urb->actual_length, 0);
++				urb->transfer_buffer, urb->actual_length, 0);
+ 		break;
+ 	case -ESHUTDOWN:	/* unplug */
+ 		unplug = 1;
 diff --git a/aosp/drivers/input/input.c b/aosp/drivers/input/input.c
 index 78be582b5766..5b548b1cf418 100644
 --- a/aosp/drivers/input/input.c
@@ -14630,6 +14788,37 @@ index 335d39eeba36..406d79a1fb7d 100644
  	}
  
  handle_cmdline:
+diff --git a/aosp/drivers/usb/gadget/function/f_midi.c b/aosp/drivers/usb/gadget/function/f_midi.c
+index c147a9f7e94d..5f022db4fa71 100644
+--- a/aosp/drivers/usb/gadget/function/f_midi.c
++++ b/aosp/aosp/drivers/usb/gadget/function/f_midi.c
+@@ -419,7 +419,6 @@ static void f_midi_disable(struct usb_function *f)
+ 	struct f_midi *midi = func_to_midi(f);
+ 	struct usb_composite_dev *cdev = f->config->cdev;
+ 	struct usb_request *req = NULL;
+-	unsigned long flags;
+ 
+ 	DBG(cdev, "disable\n");
+ 
+@@ -431,10 +430,8 @@ static void f_midi_disable(struct usb_function *f)
+ 	usb_ep_disable(midi->out_ep);
+ 
+ 	/* release IN requests */
+-	spin_lock_irqsave(&midi->transmit_lock, flags);
+ 	while (kfifo_get(&midi->in_req_fifo, &req))
+ 		free_ep_req(midi->in_ep, req);
+-	spin_unlock_irqrestore(&midi->transmit_lock, flags);
+ 
+ 	f_midi_drop_out_substreams(midi);
+ }
+@@ -663,7 +660,6 @@ static int f_midi_do_transmit(struct f_midi *midi, struct usb_ep *ep)
+ 		ERROR(midi, "%s failed to queue req: %d\n",
+ 		      midi->in_ep->name, err);
+ 		req->length = 0; /* Re-use request next time. */
+-		return err;
+ 	} else {
+ 		/* Upon success, put request at the back of the queue. */
+ 		kfifo_skip(&midi->in_req_fifo);
 diff --git a/aosp/fs/Makefile b/aosp/fs/Makefile
 index 102e4cd2bf69..a1929dbc8b8c 100644
 --- a/aosp/fs/Makefile
@@ -14643,6 +14832,26 @@ index 102e4cd2bf69..a1929dbc8b8c 100644
  ifeq ($(CONFIG_BLOCK),y)
  obj-y +=	buffer.o direct-io.o mpage.o
  else
+diff --git a/aosp/fs/crypto/keysetup.c b/aosp/fs/crypto/keysetup.c
+index 137a2b037a68..9847975110fe 100644
+--- a/aosp/fs/crypto/keysetup.c
++++ b/aosp/aosp/fs/crypto/keysetup.c
+@@ -204,14 +204,8 @@ fscrypt_find_mode_key(struct fscrypt_master_key *mk, u8 hkdf_context,
+ 		if (node->hkdf_context == hkdf_context &&
+ 		    node->mode_num == mode_num &&
+ 		    node->data_unit_bits == ci->ci_data_unit_bits &&
+-		    fscrypt_is_key_prepared(&node->key, ci)) {
+-			/*
+-			 * Upgrade the RCU dereference to a full ACQUIRE, so
+-			 * that blk-crypto global state is seen as initialized.
+-			 */
+-			smp_acquire__after_ctrl_dep();
++		    fscrypt_is_key_prepared(&node->key, ci))
+ 			return &node->key;
+-		}
+ 	}
+ 	return NULL;
+ }
 diff --git a/aosp/fs/exec.c b/aosp/fs/exec.c
 index 1a49048140a1..c30c4d715987 100644
 --- a/aosp/fs/exec.c
@@ -18329,6 +18538,19 @@ index 000000000000..1e70f7f2487d
 +/* No module exit is needed becuase it should never be a loadable kernel module */
 +//void __init susfs_exit(void)
 +
+diff --git a/aosp/include/linux/hid.h b/aosp/include/linux/hid.h
+index 76f6ad20b30d..f014b50990ca 100644
+--- a/aosp/include/linux/hid.h
++++ b/aosp/aosp/include/linux/hid.h
+@@ -965,8 +965,6 @@ extern void hidinput_disconnect(struct hid_device *);
+ int hid_set_field(struct hid_field *, unsigned, __s32);
+ int hid_input_report(struct hid_device *hid, enum hid_report_type type, u8 *data, u32 size,
+ 		     int interrupt);
+-int hid_safe_input_report(struct hid_device *hid, enum hid_report_type type, u8 *data,
+-			  size_t bufsize, u32 size, int interrupt);
+ struct hid_field *hidinput_get_led_field(struct hid_device *hid);
+ unsigned int hidinput_count_leds(struct hid_device *hid);
+ __s32 hidinput_calc_abs_res(const struct hid_field *field, __u16 code);
 diff --git a/aosp/include/linux/susfs.h b/aosp/include/linux/susfs.h
 new file mode 100644
 index 000000000000..1e0ae0406083
@@ -18900,6 +19122,32 @@ index c17bdc64e12c..584a3a426c0d 100644
  		ret = get_user_pages_remote(mm, addr, 1,
  				gup_flags, &page, &vma, NULL);
  		if (ret <= 0) {
+diff --git a/aosp/mm/migrate.c b/aosp/mm/migrate.c
+index f28e02b19ae0..5490ad64a86b 100644
+--- a/aosp/mm/migrate.c
++++ b/aosp/aosp/mm/migrate.c
+@@ -1860,7 +1860,7 @@ int migrate_pages(struct list_head *from, new_page_t get_new_page,
+ 			break;
+ 	}
+ 	if (nr_pages >= nr_batch_pages)
+-		list_cut_before(&folios, from, &folio2->lru);
++		list_cut_before(&folios, from, &folio->lru);
+ 	else
+ 		list_splice_init(from, &folios);
+ 	rc = migrate_pages_batch(&folios, get_new_page, put_new_page, private,
+diff --git a/aosp/mm/readahead.c b/aosp/mm/readahead.c
+index 7e00362379b5..0cfea790a0c6 100644
+--- a/aosp/mm/readahead.c
++++ b/aosp/aosp/mm/readahead.c
+@@ -320,7 +320,7 @@ static void do_page_cache_ra(struct readahead_control *ractl,
+ 		for (i = 0; i < nr_to_read; i++) {
+ 			struct folio *folio = filemap_get_folio(mapping, index + i);
+ 
+-			if (folio) {
++			if (!IS_ERR(folio)) {
+ 				set_bit(PG_oem_reserved_5, folio_flags(folio, 0));
+ 				folio_put(folio);
+ 			}
 diff --git a/aosp/security/selinux/avc.c b/aosp/security/selinux/avc.c
 index d93af92498f5..0e31fe21ec72 100644
 --- a/aosp/security/selinux/avc.c
