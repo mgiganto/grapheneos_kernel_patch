@@ -947,10 +947,10 @@ index 00000000..b661888a
 +ksu_uapi.h
 diff --git a/EXTRA/KernelSU/kernel/Kconfig b/EXTRA/KernelSU/kernel/Kconfig
 new file mode 100644
-index 00000000..14de4705
+index 00000000..5eb19634
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/Kconfig
-@@ -0,0 +1,136 @@
+@@ -0,0 +1,137 @@
 +menu "KernelSU"
 +
 +config KSU
@@ -1078,11 +1078,12 @@ index 00000000..14de4705
 +	  - Effective only on zygote/zygote_next spawned user app process that is marked with TIF_PROC_UMOUNTED
 +
 +config KSU_SUSFS_PRIORITY_UID_FILTER
-+	bool "Enable to support filtering getpriority uid"
++	bool "Enable to allow adding user-defined uids that will be hidden from getpriority/setpriority/ioprio_get/ioprio_set syscall"
 +	depends on KSU_SUSFS
 +	default y
 +	help
-+	  Enable to support filtering getpriority uid.
++	  - Allow hiding user-defined uids from syscalls like getpriority/setpriority/ioprio_get/ioprio_set.
++	  - Effective on all processes with uid >= 10000.
 +
 +endmenu
 +
@@ -2380,10 +2381,10 @@ index 00000000..947f6ab7
 +#endif /* __KSU_H_EXTENSION_DYNAMIC_MANAGER */
 diff --git a/EXTRA/KernelSU/kernel/extension/dynamic_sig_fallback.c b/EXTRA/KernelSU/kernel/extension/dynamic_sig_fallback.c
 new file mode 100644
-index 00000000..84ff67bd
+index 00000000..2f3c715a
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/extension/dynamic_sig_fallback.c
-@@ -0,0 +1,256 @@
+@@ -0,0 +1,270 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Signature-fallback manager crown.
@@ -2435,6 +2436,17 @@ index 00000000..84ff67bd
 +#define FILLDIR_ACTOR_STOP -EINVAL
 +#endif
 +
++/*
++ * The actor's first parameter became struct dir_context * in 3.19; older
++ * kernels hand the context over as an opaque void *. Mirrors
++ * MY_ACTOR_CTX_ARG in manager/throne_tracker.c.
++ */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 19, 0)
++#define FB_ACTOR_CTX_ARG struct dir_context *ctx
++#else
++#define FB_ACTOR_CTX_ARG void *ctx_void
++#endif
++
 +struct fb_path {
 +    char dirpath[DATA_PATH_LEN];
 +    int depth;
@@ -2449,9 +2461,12 @@ index 00000000..84ff67bd
 +    bool matched;
 +};
 +
-+static FILLDIR_RETURN_TYPE fb_actor(struct dir_context *ctx, const char *name, int namelen, loff_t off, u64 ino,
++static FILLDIR_RETURN_TYPE fb_actor(FB_ACTOR_CTX_ARG, const char *name, int namelen, loff_t off, u64 ino,
 +                                    unsigned int d_type)
 +{
++#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 19, 0)
++    struct dir_context *ctx = (struct dir_context *)ctx_void;
++#endif
 +    struct fb_dir_ctx *c = container_of(ctx, struct fb_dir_ctx, ctx);
 +    char dirpath[DATA_PATH_LEN];
 +
@@ -2712,10 +2727,10 @@ index 00000000..6176a0e4
 \ No newline at end of file
 diff --git a/EXTRA/KernelSU/kernel/extension/extension.c b/EXTRA/KernelSU/kernel/extension/extension.c
 new file mode 100644
-index 00000000..445f8349
+index 00000000..b42aed7a
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/extension/extension.c
-@@ -0,0 +1,605 @@
+@@ -0,0 +1,626 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Extension subsystem dispatcher.
@@ -2741,8 +2756,12 @@ index 00000000..445f8349
 +static DEFINE_MUTEX(extension_mutex);
 +
 +static const char *const extension_names[KSU_EXTENSION_MAX] = {
++#ifdef KSU_CAN_USE_KPM
 +    [KSU_EXTENSION_KPM] = "kpm",
++#endif
++#ifdef KSU_CAN_USE_CPU_SPOOF
 +    [KSU_EXTENSION_CPU_SPOOF] = "cpu_spoof",
++#endif
 +    [KSU_EXTENSION_UMOUNT_PATHS] = "umount_paths",
 +    [KSU_EXTENSION_DYNAMIC_MANAGER] = "dynamic_manager",
 +    [KSU_EXTENSION_SUSFS] = "susfs",
@@ -2847,8 +2866,12 @@ index 00000000..445f8349
 +
 +static const struct kernel_param_ops force_extension_param_ops = {
 +    /* A bare `force_extension` would otherwise fail parse_args() and
-+     * the whole module load: keep it no-arg-friendly. */
++     * the whole module load: keep it no-arg-friendly.
++     * KERNEL_PARAM_OPS_FL_NOARG (and the ops->flags member) only exists
++     * since 3.18, so old trees must not see the designator at all. */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 18, 0)
 +    .flags = KERNEL_PARAM_OPS_FL_NOARG,
++#endif
 +    .set = force_extension_param_set,
 +};
 +module_param_cb(force_extension, &force_extension_param_ops, NULL, 0);
@@ -3228,6 +3251,12 @@ index 00000000..445f8349
 + */
 +void __init ksu_extension_register_all(void)
 +{
++    /*
++     * KPM and CPU spoof are only built on 5.10+; on older kernels their
++     * headers and unity-included sources are not compiled at all, so no
++     * handler exists and userspace sees them as unsupported.
++     */
++#ifdef KSU_CAN_USE_KPM
 +    /* KPM exposes .get (so KSU_EXTENSION_GET reports CONFIG_KPM)
 +     * but no .set. Forced-by-config is applied through
 +     * ksu_extension_kpm_apply_forced, a kernel-side callback that
@@ -3243,6 +3272,8 @@ index 00000000..445f8349
 +        .io_handler = ksu_extension_kpm_io,
 +        .apply_forced = ksu_extension_kpm_apply_forced,
 +    };
++#endif /* KSU_CAN_USE_KPM */
++#ifdef KSU_CAN_USE_CPU_SPOOF
 +    static const struct ksu_extension_handler cpu_spoof_handler = {
 +        .extension_id = KSU_EXTENSION_CPU_SPOOF,
 +        .name = "cpu_spoof",
@@ -3251,6 +3282,7 @@ index 00000000..445f8349
 +        .ops = NULL,
 +        .io_handler = ksu_extension_cpu_spoof_io,
 +    };
++#endif /* KSU_CAN_USE_CPU_SPOOF */
 +    static const struct ksu_extension_handler umount_paths_handler = {
 +        .extension_id = KSU_EXTENSION_UMOUNT_PATHS,
 +        .name = "umount_paths",
@@ -3292,10 +3324,14 @@ index 00000000..445f8349
 +        .wipe = ksu_extension_version_spoof_wipe,
 +    };
 +
++#ifdef KSU_CAN_USE_KPM
 +    if (ksu_register_extension_handler(&kpm_handler))
 +        pr_err("extension: failed to register kpm\n");
++#endif
++#ifdef KSU_CAN_USE_CPU_SPOOF
 +    if (ksu_register_extension_handler(&cpu_spoof_handler))
 +        pr_err("extension: failed to register cpu_spoof\n");
++#endif
 +    if (ksu_register_extension_handler(&umount_paths_handler))
 +        pr_err("extension: failed to register umount_paths\n");
 +    if (ksu_register_extension_handler(&dynamic_manager_handler))
@@ -3308,8 +3344,8 @@ index 00000000..445f8349
 +    /* Publish: any future ksu_extension_apply_forced() is now safe.
 +     * The release-store pairs with the acquire-load in
 +     * ksu_extension_apply_forced() so that, on the calling CPU,
-+     * the four ksu_register_extension_handler() writes above are
-+     * visible before the flag is observed as set. */
++     * the handler registration writes above are visible before the
++     * flag is observed as set. */
 +    smp_wmb();
 +    WRITE_ONCE(extensions_registered, true);
 +}
@@ -3665,18 +3701,19 @@ index 00000000..c99d16a3
 +}
 diff --git a/EXTRA/KernelSU/kernel/extension/kpm.h b/EXTRA/KernelSU/kernel/extension/kpm.h
 new file mode 100644
-index 00000000..48473fb5
+index 00000000..226434c8
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/extension/kpm.h
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,16 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +#ifndef __KSU_H_EXTENSION_KPM_GLUE
 +#define __KSU_H_EXTENSION_KPM_GLUE
 +
 +/* KPM extension glue (extension/kpm.c). Sticky state + io passthrough
 + * to the actual KPM control surface (extension/kpm/kpm.c). Built
-+ * unconditionally so extension/extension.c can reference the symbols
-+ * regardless of CONFIG_KPM. */
++ * unconditionally on 5.10+ so extension/extension.c can reference the
++ * symbols regardless of CONFIG_KPM. On older kernels the whole KPM
++ * subsystem is compiled out and these symbols do not exist. */
 +int ksu_extension_kpm_get(u32 id, u64 *value);
 +int ksu_extension_kpm_io(u32 id, void __user *raw);
 +void ksu_extension_kpm_apply_forced(u32 id, u64 value);
@@ -5900,10 +5937,10 @@ index 00000000..d8bcbfe2
 +#endif // __KSU_H_MOUNT_HIDE
 diff --git a/EXTRA/KernelSU/kernel/feature/selinux_hide.c b/EXTRA/KernelSU/kernel/feature/selinux_hide.c
 new file mode 100644
-index 00000000..76838d40
+index 00000000..ca0c04ac
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/feature/selinux_hide.c
-@@ -0,0 +1,1096 @@
+@@ -0,0 +1,1250 @@
 +#include "selinux_hide.h"
 +#include "selinux/sepolicy.h"
 +#include <linux/cred.h>
@@ -5962,6 +5999,7 @@ index 00000000..76838d40
 +                                               u32 *sid, u32 def_sid, gfp_t gfp_flags, u32 *orig_sid_p, int *orig_rc_p);
 +static int security_sid_to_context_with_policy(struct selinux_policy *policy, u32 sid, char **scontext,
 +                                               u32 *scontext_len);
++static int security_context_to_sid_live(const char *scontext, u32 scontext_len, u32 *sid);
 +static void security_compute_av_user_with_policy(struct selinux_policy *policy, u32 ssid, u32 tsid, u16 tclass,
 +                                                 struct av_decision *avd);
 +static void (*security_dump_masked_av_fn)(struct policydb *policydb, struct context *scontext, struct context *tcontext,
@@ -6121,16 +6159,22 @@ index 00000000..76838d40
 +    if (error)
 +        return error;
 +
-+    /* Obtain a SID for the context, if one was specified. */
-+    if (size && str[0] && str[0] != '\n') {
++    /* Keep every non-empty value on the backup validation path */
++    if (size && str[0]) {
 +        if (str[size - 1] == '\n') {
 +            str[size - 1] = 0;
 +            size--;
 +        }
-+        error2 = security_context_to_sid_with_policy(backup_sepolicy, value, size, &tmp_sid, SECSID_NULL, GFP_KERNEL,
-+                                                     &sid, &error);
-+        if (error2 || error)
-+            return error2 ?: error;
++        error = security_context_to_sid_live(value, size, &sid);
++        if (error == -EAGAIN) {
++            // stale type mark, use the dual parse
++            error2 = security_context_to_sid_with_policy(backup_sepolicy, value, size, &tmp_sid, SECSID_NULL,
++                                                         GFP_KERNEL, &sid, &error);
++            if (error2 || error)
++                return error2 ?: error;
++        } else if (error) {
++            return error;
++        }
 +    }
 +
 +    new = prepare_creds();
@@ -6333,14 +6377,17 @@ index 00000000..76838d40
 + */
 +static int string_to_context_struct(struct policydb *pol, struct policydb *orig_pol, struct sidtab *sidtabp,
 +                                    struct sidtab *orig_sidtabp, char *scontext, const char *source, u32 source_len,
-+                                    struct context *ctx, struct context *orig_ctx, u32 def_sid, int *orig_rc_p)
++                                    struct context *ctx, struct context *orig_ctx, u32 policy_generation, u32 def_sid,
++                                    int *orig_rc_p)
 +{
 +    struct role_datum *role, *orig_role;
 +    struct type_datum *typdatum, *orig_typdatum;
 +    struct user_datum *usrdatum, *orig_usrdatum;
 +    char *scontextp, *p, oldc;
 +    bool orig_valid = true;
++    bool live_valid = true;
 +    int rc = -EINVAL, orig_rc = -EINVAL;
++    int type_is_original;
 +
 +    context_init(ctx);
 +    context_init(orig_ctx);
@@ -6361,10 +6408,10 @@ index 00000000..76838d40
 +
 +    usrdatum = symtab_search(&pol->p_users, scontextp);
 +    orig_usrdatum = symtab_search(&orig_pol->p_users, scontextp);
-+    if (!usrdatum)
-+        goto out;
-+
-+    ctx->user = usrdatum->value;
++    if (usrdatum)
++        ctx->user = usrdatum->value;
++    else
++        live_valid = false;
 +    if (orig_usrdatum)
 +        orig_ctx->user = orig_usrdatum->value;
 +    else
@@ -6382,9 +6429,10 @@ index 00000000..76838d40
 +
 +    role = symtab_search(&pol->p_roles, scontextp);
 +    orig_role = symtab_search(&orig_pol->p_roles, scontextp);
-+    if (!role)
-+        goto out;
-+    ctx->role = role->value;
++    if (role)
++        ctx->role = role->value;
++    else
++        live_valid = false;
 +    if (orig_role)
 +        orig_ctx->role = orig_role->value;
 +    else
@@ -6398,15 +6446,27 @@ index 00000000..76838d40
 +    *p++ = 0;
 +
 +    typdatum = symtab_search(&pol->p_types, scontextp);
-+    orig_typdatum = symtab_search(&orig_pol->p_types, scontextp);
-+    if (!typdatum || typdatum->attribute)
-+        goto out;
++    if (!typdatum || typdatum->attribute) {
++        live_valid = false;
++    } else {
++        ctx->type = typdatum->value;
++        // Type values stay stable when KSU copies the live policy
++        type_is_original = ksu_type_is_original(orig_pol, policy_generation, typdatum->value);
++        if (type_is_original < 0) {
++            orig_typdatum = symtab_search(&orig_pol->p_types, scontextp);
++            if (orig_typdatum && !orig_typdatum->attribute)
++                orig_ctx->type = orig_typdatum->value;
++            else
++                orig_valid = false;
++        } else if (type_is_original) {
++            orig_ctx->type = typdatum->value;
++        } else {
++            orig_valid = false;
++        }
++    }
 +
-+    ctx->type = typdatum->value;
-+    if (orig_typdatum && !orig_typdatum->attribute)
-+        orig_ctx->type = orig_typdatum->value;
-+    else
-+        orig_valid = false;
++    if (!live_valid)
++        goto out;
 +
 +    rc = mls_context_to_sid(pol, oldc, p, ctx, sidtabp, def_sid);
 +    if (orig_valid) {
@@ -6474,7 +6534,7 @@ index 00000000..76838d40
 +    // parse both policies together
 +    orig_rc = -EINVAL;
 +    rc = string_to_context_struct(policydb, orig_policydb, sidtab, orig_sidtab, scontext2, scontext, scontext_len,
-+                                  &context, &orig_context, def_sid, &orig_rc);
++                                  &context, &orig_context, orig_policy->latest_granting, def_sid, &orig_rc);
 +    if (rc)
 +        goto out_unlock;
 +
@@ -6509,6 +6569,137 @@ index 00000000..76838d40
 +    rcu_read_unlock();
 +    if (orig_rc_p)
 +        *orig_rc_p = orig_rc;
++    kfree(scontext2);
++    return rc;
++}
++
++/*
++ * Caveat:  Mutates scontext.
++ */
++static int backup_string_to_context_struct(struct policydb *pol, struct policydb *live_pol, struct sidtab *sidtabp,
++                                           char *scontext, struct context *ctx, u32 policy_generation, u32 def_sid)
++{
++    struct role_datum *role;
++    struct type_datum *typdatum;
++    struct user_datum *usrdatum;
++    char *scontextp, *p, oldc;
++    int rc = 0, type_is_original;
++
++    context_init(ctx);
++
++    /* Parse the security context. */
++
++    rc = -EINVAL;
++    scontextp = scontext;
++
++    /* Extract the user. */
++    p = scontextp;
++    while (*p && *p != ':')
++        p++;
++
++    if (*p == 0)
++        goto out;
++
++    *p++ = 0;
++
++    usrdatum = symtab_search(&pol->p_users, scontextp);
++    if (!usrdatum)
++        goto out;
++
++    ctx->user = usrdatum->value;
++
++    /* Extract role. */
++    scontextp = p;
++    while (*p && *p != ':')
++        p++;
++
++    if (*p == 0)
++        goto out;
++
++    *p++ = 0;
++
++    role = symtab_search(&pol->p_roles, scontextp);
++    if (!role)
++        goto out;
++    ctx->role = role->value;
++
++    /* Extract type. */
++    scontextp = p;
++    while (*p && *p != ':')
++        p++;
++    oldc = *p;
++    *p++ = 0;
++
++    // ksu types fail like unknown types
++    typdatum = symtab_search(&pol->p_types, scontextp);
++    if (!typdatum || typdatum->attribute)
++        goto out;
++
++    type_is_original = ksu_type_is_original(live_pol, policy_generation, typdatum->value);
++    if (type_is_original <= 0) {
++        rc = -EAGAIN;
++        goto out;
++    }
++
++    ctx->type = typdatum->value;
++
++    rc = mls_context_to_sid(pol, oldc, p, ctx, sidtabp, def_sid);
++    if (rc)
++        goto out;
++
++    /* Check the validity of the new context. */
++    // user, role and original type values are the same in both policies
++    rc = -EINVAL;
++    if (!policydb_context_isvalid(pol, ctx) || !policydb_context_isvalid(live_pol, ctx))
++        goto out;
++    rc = 0;
++out:
++    if (rc)
++        context_destroy(ctx);
++    return rc;
++}
++
++// parse once like security_context_to_sid(), -EAGAIN if the type mark is stale
++static int security_context_to_sid_live(const char *scontext, u32 scontext_len, u32 *sid)
++{
++    struct selinux_policy *policy;
++    struct context context;
++    char *scontext2;
++    u32 backup_sid;
++    int rc;
++
++    /* An empty security context is never valid. */
++    if (!scontext_len)
++        return -EINVAL;
++
++    /* Copy the string to allow changes and ensure a NUL terminator */
++    scontext2 = kmemdup_nul(scontext, scontext_len, GFP_KERNEL);
++    if (!scontext2)
++        return -ENOMEM;
++
++    *sid = SECSID_NULL;
++retry:
++    rcu_read_lock();
++    policy = rcu_dereference(selinux_state.policy);
++    rc = backup_string_to_context_struct(&backup_sepolicy->policydb, &policy->policydb, backup_sepolicy->sidtab,
++                                         scontext2, &context, policy->latest_granting, SECSID_NULL);
++    if (rc)
++        goto out_unlock;
++
++    // update backup sidtab first
++    rc = sidtab_context_to_sid(backup_sepolicy->sidtab, &context, &backup_sid);
++    if (!rc)
++        rc = sidtab_context_to_sid(policy->sidtab, &context, sid);
++    context_destroy(&context);
++    if (rc == -ESTALE) {
++        // retry after live policy reload
++        rcu_read_unlock();
++        memcpy(scontext2, scontext, scontext_len);
++        scontext2[scontext_len] = '\0';
++        goto retry;
++    }
++out_unlock:
++    rcu_read_unlock();
 +    kfree(scontext2);
 +    return rc;
 +}
@@ -10751,10 +10942,10 @@ index 00000000..24bf516c
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/kernel_compat.h b/EXTRA/KernelSU/kernel/kernel_compat.h
 new file mode 100644
-index 00000000..2442eef5
+index 00000000..8493a7ac
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/kernel_compat.h
-@@ -0,0 +1,272 @@
+@@ -0,0 +1,284 @@
 +#ifndef __KSU_H_KERNEL_COMPAT
 +#define __KSU_H_KERNEL_COMPAT
 +
@@ -11023,7 +11214,19 @@ index 00000000..2442eef5
 +
 +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 3, 0) || defined(KSU_HAS_MODERN_STATIC_KEY_INTERFACE)
 +#define KSU_COMPAT_USE_STATIC_KEY
++#endif
 +
++/*
++ * KPM (extension/kpm) and the CPU spoof extension rely on kernel interfaces
++ * that are only supported on 5.10+. Compile their call sites out entirely
++ * below that, regardless of CONFIG_KPM, so 3.x/4.x/5.4 trees never pull in
++ * their headers, code or runtime hooks.
++ */
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
++#define KSU_CAN_USE_CPU_SPOOF
++#endif
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 0)
++#define KSU_CAN_USE_KPM
 +#endif
 +
 +#endif
@@ -11211,10 +11414,10 @@ index 00000000..422fde3d
 +#endif // __KSU_H_KERNEL_INCLUDES
 diff --git a/EXTRA/KernelSU/kernel/ksu_main.c b/EXTRA/KernelSU/kernel/ksu_main.c
 new file mode 100644
-index 00000000..8b1272d5
+index 00000000..60bc7655
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/ksu_main.c
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,234 @@
 +#include "kernel_includes.h"
 +
 +// uapi
@@ -11275,13 +11478,17 @@ index 00000000..8b1272d5
 +#endif
 +
 +#include "extension/extension.h"
++#ifdef KSU_CAN_USE_CPU_SPOOF
 +#include "extension/cpu_spoof.h"
++#endif
 +#include "extension/umount_paths.h"
 +#include "extension/dynamic_manager.h"
++#ifdef KSU_CAN_USE_KPM
 +#include "extension/kpm.h"
 +#include "extension/kpm/kpm.h"
 +#include "extension/kpm/compact.h"
 +#include "extension/kpm/super_access.h"
++#endif
 +#include "extension/susfs_extension.h"
 +#include "extension/dynamic_sig_fallback.h"
 +#include "extension/version_spoof.h"
@@ -11294,13 +11501,17 @@ index 00000000..8b1272d5
 +
 +// unity build
 +#include "extension/extension.c"
++#ifdef KSU_CAN_USE_CPU_SPOOF
 +#include "extension/cpu_spoof.c"
++#endif
 +#include "extension/umount_paths.c"
 +#include "extension/dynamic_manager.c"
++#ifdef KSU_CAN_USE_KPM
 +#include "extension/kpm.c"
 +#include "extension/kpm/kpm.c"
 +#include "extension/kpm/compact.c"
 +#include "extension/kpm/super_access.c"
++#endif
 +#include "extension/susfs_extension.c"
 +#include "extension/dynamic_sig_fallback.c"
 +#include "extension/version_spoof.c"
@@ -11858,10 +12069,10 @@ index 00000000..c4f11c97
 +#endif // __KSU_H_MANAGER_OBSERVER
 diff --git a/EXTRA/KernelSU/kernel/manager/pkg_observer.c b/EXTRA/KernelSU/kernel/manager/pkg_observer.c
 new file mode 100644
-index 00000000..0fe6f816
+index 00000000..f75a8c49
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/manager/pkg_observer.c
-@@ -0,0 +1,171 @@
+@@ -0,0 +1,166 @@
 +// SPDX-License-Identifier: GPL-2.0
 +#define MASK_SYSTEM (FS_CREATE | FS_MOVE | FS_EVENT_ON_CHILD)
 +
@@ -11898,11 +12109,6 @@ index 00000000..0fe6f816
 +static void ksu_defer_track_throne(void)
 +{
 +    struct callback_head *cb;
-+
-+#ifdef CONFIG_KSU_SUSFS_PRIORITY_UID_FILTER
-+    // Renew the getpriority uid bitmap filter
-+    susfs_parse_priority_app_strings();
-+#endif
 +
 +    if (!(current->flags & PF_KTHREAD)) {
 +        cb = kzalloc(sizeof(*cb), GFP_KERNEL);
@@ -26785,10 +26991,10 @@ index 00000000..e30fc934
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/selinux/rules.c b/EXTRA/KernelSU/kernel/selinux/rules.c
 new file mode 100644
-index 00000000..3d5b86e9
+index 00000000..6f73a740
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/selinux/rules.c
-@@ -0,0 +1,779 @@
+@@ -0,0 +1,790 @@
 +#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
 +#define SELINUX_POLICY_INSTEAD_SELINUX_SS
 +struct selinux_policy *backup_sepolicy;
@@ -26802,17 +27008,17 @@ index 00000000..3d5b86e9
 +extern int avc_ss_reset(struct selinux_avc *avc, u32 seqno);
 +#endif
 +// reset avc cache table, otherwise the new rules will not take effect if already denied
-+static void reset_avc_cache(void)
++static void reset_avc_cache(u32 seqno)
 +{
 +#if ((!defined(KSU_COMPAT_USE_SELINUX_STATE)) || LINUX_VERSION_CODE >= KERNEL_VERSION(6, 4, 0))
-+    avc_ss_reset(0);
-+    selnl_notify_policyload(0);
-+    selinux_status_update_policyload(0);
++    avc_ss_reset(seqno);
++    selnl_notify_policyload(seqno);
++    selinux_status_update_policyload(seqno);
 +#else
 +    struct selinux_avc *avc = selinux_state.avc;
-+    avc_ss_reset(avc, 0);
-+    selnl_notify_policyload(0);
-+    selinux_status_update_policyload(&selinux_state, 0);
++    avc_ss_reset(avc, seqno);
++    selnl_notify_policyload(seqno);
++    selinux_status_update_policyload(&selinux_state, seqno);
 +#endif
 +    selinux_xfrm_notify_policyload();
 +}
@@ -26982,13 +27188,17 @@ index 00000000..3d5b86e9
 +    }
 +    db = &pol->policydb;
 +
++    pol->latest_granting = old_pol->latest_granting + 1;
++    if (!ksu_set_original_types(db, &old_pol->policydb, pol->latest_granting))
++        pr_warn("failed to save original type metadata, use backup lookups\n");
++
 +    apply_kernelsu_rules_fn((void *)db);
 +
 +    rcu_assign_pointer(selinux_state.policy, pol);
 +    synchronize_rcu();
 +    ksu_destroy_sepolicy(old_pol);
 +
-+    reset_avc_cache();
++    reset_avc_cache(pol->latest_granting);
 +#ifdef CONFIG_KSU_SUSFS
 +    susfs_set_batch_sid();
 +#endif
@@ -27045,7 +27255,10 @@ index 00000000..3d5b86e9
 +
 +out_flush:
 +    smp_mb();
-+    reset_avc_cache();
++    reset_avc_cache(0);
++#ifdef CONFIG_KSU_SUSFS
++    susfs_set_batch_sid();
++#endif
 +#endif
 +}
 +
@@ -27400,11 +27613,15 @@ index 00000000..3d5b86e9
 +        cmd_index++;
 +    }
 +
++    pol->latest_granting = old_pol->latest_granting + 1;
++    if (!ksu_advance_original_types(db, &old_pol->policydb, old_pol->latest_granting, pol->latest_granting))
++        pr_warn("failed to carry original type metadata, use backup lookups\n");
++
 +    rcu_assign_pointer(selinux_state.policy, pol);
 +    synchronize_rcu();
 +    ksu_destroy_sepolicy(old_pol);
 +
-+    reset_avc_cache();
++    reset_avc_cache(pol->latest_granting);
 +    ret = success_cmd_count;
 +    goto out_unlock;
 +
@@ -27559,7 +27776,7 @@ index 00000000..3d5b86e9
 +        goto out_free;
 +
 +    smp_mb();
-+    reset_avc_cache();
++    reset_avc_cache(0);
 +    ret = success_cmd_count;
 +
 +out_free:
@@ -27977,10 +28194,10 @@ index 00000000..91dccc6d
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/selinux/sepolicy.c b/EXTRA/KernelSU/kernel/selinux/sepolicy.c
 new file mode 100644
-index 00000000..e57da5d5
+index 00000000..6b4e0ef3
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/selinux/sepolicy.c
-@@ -0,0 +1,1220 @@
+@@ -0,0 +1,1272 @@
 +#ifdef CONFIG_KSU_SUSFS
 +extern int susfs_add_sus_avd_allowed_by_type(u32 s_type, u32 t_type, u16 type, u32 orig_avd_allowed);
 +extern int susfs_add_sus_type(const char *secctx, u32 type_value);
@@ -28024,6 +28241,10 @@ index 00000000..e57da5d5
 +static void add_typeattribute_raw(struct policydb *db, struct type_datum *type, struct type_datum *attr);
 +
 +static bool add_typeattribute(struct policydb *db, const char *type, const char *attr);
++
++static const struct policydb *ksu_original_types_policy;
++static u32 ksu_original_types_limit;
++static u32 ksu_original_types_generation;
 +
 +//////////////////////////////////////////////////////
 +// Implementation
@@ -29042,6 +29263,54 @@ index 00000000..e57da5d5
 +    return symtab_search(&db->p_types, type) != NULL;
 +}
 +
++bool ksu_set_original_types(struct policydb *db, struct policydb *orig_db, u32 policy_generation)
++{
++    if (!db || !orig_db || !policy_generation || orig_db->p_types.nprim > db->p_types.nprim) {
++        WRITE_ONCE(ksu_original_types_generation, 0);
++        WRITE_ONCE(ksu_original_types_policy, NULL);
++        WRITE_ONCE(ksu_original_types_limit, 0);
++        return false;
++    }
++
++    WRITE_ONCE(ksu_original_types_limit, orig_db->p_types.nprim);
++    WRITE_ONCE(ksu_original_types_generation, policy_generation);
++    WRITE_ONCE(ksu_original_types_policy, db);
++    return true;
++}
++
++bool ksu_advance_original_types(struct policydb *db, struct policydb *old_db, u32 old_policy_generation,
++                                u32 policy_generation)
++{
++    u32 original_types_limit = READ_ONCE(ksu_original_types_limit);
++    u32 original_types_generation = READ_ONCE(ksu_original_types_generation);
++
++    if (!db || !old_db || !old_policy_generation || !policy_generation || !original_types_limit ||
++        !original_types_generation || old_policy_generation != original_types_generation ||
++        READ_ONCE(ksu_original_types_policy) != old_db || db->p_types.nprim < original_types_limit) {
++        WRITE_ONCE(ksu_original_types_generation, 0);
++        WRITE_ONCE(ksu_original_types_policy, NULL);
++        WRITE_ONCE(ksu_original_types_limit, 0);
++        return false;
++    }
++
++    WRITE_ONCE(ksu_original_types_generation, policy_generation);
++    WRITE_ONCE(ksu_original_types_policy, db);
++    return true;
++}
++
++int ksu_type_is_original(struct policydb *db, u32 policy_generation, u32 type_value)
++{
++    const struct policydb *original_types_policy = READ_ONCE(ksu_original_types_policy);
++    u32 original_types_limit = READ_ONCE(ksu_original_types_limit);
++    u32 original_types_generation = READ_ONCE(ksu_original_types_generation);
++
++    if (!db || !policy_generation || original_types_policy != db || original_types_generation != policy_generation ||
++        !original_types_limit || type_value > db->p_types.nprim)
++        return -1;
++
++    return type_value && type_value <= original_types_limit ? 1 : 0;
++}
++
 +// Access vector rules
 +bool ksu_allow(struct policydb *db, const char *src, const char *tgt, const char *cls, const char *perm)
 +{
@@ -29203,10 +29472,10 @@ index 00000000..e57da5d5
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/selinux/sepolicy.h b/EXTRA/KernelSU/kernel/selinux/sepolicy.h
 new file mode 100644
-index 00000000..870fd672
+index 00000000..4364ca97
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/selinux/sepolicy.h
-@@ -0,0 +1,40 @@
+@@ -0,0 +1,46 @@
 +#ifndef __KSU_H_SEPOLICY
 +#define __KSU_H_SEPOLICY
 +
@@ -29225,6 +29494,12 @@ index 00000000..870fd672
 +bool ksu_enforce(struct policydb *db, const char *type);
 +bool ksu_typeattribute(struct policydb *db, const char *type, const char *attr);
 +bool ksu_exists(struct policydb *db, const char *type);
++
++// Return 1 when the type value is from the initial policy, 0 when it is not, and -1 when metadata is unavailable
++int ksu_type_is_original(struct policydb *db, u32 policy_generation, u32 type_value);
++bool ksu_set_original_types(struct policydb *db, struct policydb *orig_db, u32 policy_generation);
++bool ksu_advance_original_types(struct policydb *db, struct policydb *old_db, u32 old_policy_generation,
++                                u32 policy_generation);
 +
 +// Access vector rules
 +bool ksu_allow(struct policydb *db, const char *src, const char *tgt, const char *cls, const char *perm);
