@@ -1,32 +1,3815 @@
-diff --git a//.gitignore b//.gitignore
-index b3e835807..8dc290e36 100644
---- a//.gitignore
-+++ b///.gitignore
-@@ -2,3 +2,4 @@
- out/
+diff --git a/aosp/Documentation/userspace-api/ioctl/ioctl-number.rst b/aosp/Documentation/userspace-api/ioctl/ioctl-number.rst
+index a30c4f00ec69..8fe76d5094ca 100644
+--- a/aosp/Documentation/userspace-api/ioctl/ioctl-number.rst
++++ b/aosp/aosp/Documentation/userspace-api/ioctl/ioctl-number.rst
+@@ -354,8 +354,6 @@ Code  Seq#    Include File                                             Comments
+ 0xB6  all    linux/fpga-dfl.h
+ 0xB7  all    uapi/linux/remoteproc_cdev.h                              <mailto:linux-remoteproc@vger.kernel.org>
+ 0xB7  all    uapi/linux/nsfs.h                                         <mailto:Andrei Vagin <avagin@openvz.org>>
+-0xBC  00-0F  uapi/linux/wrapfd.h                                       WrapFD driver
+-                                                                       <mailto:surenb@google.com>
+ 0xC0  00-0F  linux/usb/iowarrior.h
+ 0xCA  00-0F  uapi/misc/cxl.h
+ 0xCA  10-2F  uapi/misc/ocxl.h
+diff --git a/aosp/android/abi_gki_aarch64.stg b/aosp/android/abi_gki_aarch64.stg
+index 37976d556184..7044bd33bc61 100644
+--- a/aosp/android/abi_gki_aarch64.stg
++++ b/aosp/aosp/android/abi_gki_aarch64.stg
+@@ -47286,10 +47286,10 @@ member {
+   offset: 512
+ }
+ member {
+-  id: 0x14e2b5b9
++  id: 0x14e2bc0d
+   name: "allow_connect"
+   type_id: 0x6d7f5ff6
+-  offset: 7632
++  offset: 7568
+ }
+ member {
+   id: 0x1098af81
+@@ -67390,10 +67390,10 @@ member {
+   offset: 1152
+ }
+ member {
+-  id: 0x997c277f
++  id: 0x997c2cff
+   name: "connect_lock"
+   type_id: 0xa7c362b0
+-  offset: 8064
++  offset: 8000
+ }
+ member {
+   id: 0xee1e8424
+@@ -98055,12 +98055,6 @@ member {
+   type_id: 0xc9082b19
+   offset: 8960
+ }
+-member {
+-  id: 0x7045393c
+-  name: "gadget_release"
+-  type_id: 0x0e93a255
+-  offset: 128
+-}
+ member {
+   id: 0x874e48ae
+   name: "gadget_ssp_rate"
+@@ -121076,6 +121070,12 @@ member {
+   type_id: 0xd3c80119
+   offset: 45824
+ }
++member {
++  id: 0x7c00e340
++  name: "list"
++  type_id: 0xd3c80119
++  offset: 7424
++}
+ member {
+   id: 0x7c00e3d1
+   name: "list"
+@@ -121190,12 +121190,6 @@ member {
+   type_id: 0xd3c80119
+   offset: 2688
+ }
+-member {
+-  id: 0x7c00eb44
+-  name: "list"
+-  type_id: 0xd3c80119
+-  offset: 7488
+-}
+ member {
+   id: 0x7c00ebab
+   name: "list"
+@@ -188325,10 +188319,10 @@ member {
+   offset: 448
+ }
+ member {
+-  id: 0x5367c615
++  id: 0x5367cfd2
+   name: "started"
+   type_id: 0x6d7f5ff6
+-  offset: 7624
++  offset: 7560
+ }
+ member {
+   id: 0x539372a0
+@@ -195774,12 +195768,6 @@ member {
+   type_id: 0xcab227f8
+   offset: 3136
+ }
+-member {
+-  id: 0xc10d91ec
+-  name: "teardown"
+-  type_id: 0x6d7f5ff6
+-  offset: 7640
+-}
+ member {
+   id: 0xc16e0c1e
+   name: "teardown"
+@@ -208141,10 +208129,10 @@ member {
+   offset: 960
+ }
+ member {
+-  id: 0xa8b1af73
++  id: 0xa8b1a153
+   name: "vbus"
+   type_id: 0x6d7f5ff6
+-  offset: 7616
++  offset: 7552
+ }
+ member {
+   id: 0x7dc18b99
+@@ -208202,10 +208190,10 @@ member {
+   bitsize: 1
+ }
+ member {
+-  id: 0xdf3f6f30
++  id: 0xdf3f679f
+   name: "vbus_work"
+   type_id: 0x1f3c8679
+-  offset: 7680
++  offset: 7616
+ }
+ member {
+   id: 0xf6f15b5e
+@@ -272908,18 +272896,16 @@ struct_union {
+   kind: STRUCT
+   name: "usb_udc"
+   definition {
+-    bytesize: 1056
++    bytesize: 1048
+     member_id: 0xd477fd9a
+     member_id: 0x1875f4a8
+-    member_id: 0x7045393c
+-    member_id: 0xce1ac980
+-    member_id: 0x7c00eb44
+-    member_id: 0xa8b1af73
+-    member_id: 0x5367c615
+-    member_id: 0x14e2b5b9
+-    member_id: 0xc10d91ec
+-    member_id: 0xdf3f6f30
+-    member_id: 0x997c277f
++    member_id: 0xce1ac88b
++    member_id: 0x7c00e340
++    member_id: 0xa8b1a153
++    member_id: 0x5367cfd2
++    member_id: 0x14e2bc0d
++    member_id: 0xdf3f679f
++    member_id: 0x997c2cff
+   }
+ }
+ struct_union {
+diff --git a/aosp/android/abi_gki_aarch64.stg.allowed_breaks b/aosp/android/abi_gki_aarch64.stg.allowed_breaks
+index 3a3774f72268..6ec980aeb1b7 100644
+--- a/aosp/android/abi_gki_aarch64.stg.allowed_breaks
++++ b/aosp/aosp/android/abi_gki_aarch64.stg.allowed_breaks
+@@ -217,11 +217,3 @@ type 'struct fscrypt_master_key' changed
+   2 members ('siphash_key_t mk_ino_hash_key' .. 'bool mk_ino_hash_key_initialized') changed
+     offset changed by -4032
  
- device.bazelrc
-+EXTRA/
-diff --git a//common/ack b//common/ack
-index ae67dbef0..d33819868 160000
---- a//common/ack
-+++ b///common/ack
-@@ -1 +1 @@
--Subproject commit ae67dbef00c84298cbc93fa080e695dd96e7e583
-+Subproject commit d3381986817605762253233c3d2de680fc0c0188
-diff --git a//private/devices/google/common/tools/build_dist.sh b//private/devices/google/common/tools/build_dist.sh
-index 2e77e7ca8..4e5cf5ada 100755
---- a//private/devices/google/common/tools/build_dist.sh
-+++ b///private/devices/google/common/tools/build_dist.sh
-@@ -41,5 +41,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
- prebuilts/clang/host/linux-x86/clang-r487747c/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
- find out/${DEVICE}/dist -type f -name "*.ko" \
-   -exec ${sign_file} sha256 \
--  $(find out/ -type f -name "signing_key.pem") \
--  $(find out/ -type f -name "signing_key.x509") {} \;
-\ No newline at end of file
-+  $(find out/ -type f -name "signing_key.pem" | head -n1) \
-+  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
-\ No newline at end of file
+-type 'struct usb_udc' changed
+-  byte size changed from 1048 to 1056
+-  member 'void(* gadget_release)(struct device*)' was added
+-  7 members ('struct device dev' .. 'struct mutex connect_lock') changed
+-    offset changed by 64
+-
+-type 'struct usb_udc' changed
+-  member 'bool teardown' was added
+diff --git a/aosp/arch/arm64/configs/gki_defconfig b/aosp/arch/arm64/configs/gki_defconfig
+index d3bd4a290eb1..c39574a6940d 100644
+--- a/aosp/arch/arm64/configs/gki_defconfig
++++ b/aosp/aosp/arch/arm64/configs/gki_defconfig
+@@ -618,7 +618,6 @@ CONFIG_ANDROID_BINDERFS=y
+ CONFIG_ANDROID_DEBUG_SYMBOLS=y
+ CONFIG_ANDROID_VENDOR_HOOKS=y
+ CONFIG_ANDROID_DEBUG_KINFO=y
+-CONFIG_ANDROID_WRAPFD=y
+ CONFIG_LIBNVDIMM=y
+ CONFIG_INTERCONNECT=y
+ CONFIG_EXT4_FS=y
+diff --git a/aosp/arch/arm64/kvm/hyp/nvhe/pkvm.c b/aosp/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 24e3e8a68821..0b1daeb3c5c6 100644
+--- a/aosp/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/aosp/aosp/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -792,10 +792,8 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
+ 	vm_size = pkvm_get_hyp_vm_size(nr_vcpus);
+ 	last_ran_size = pkvm_get_last_ran_size();
+ 	pgd_size = kvm_pgtable_stage2_pgd_size(host_mmu.arch.vtcr);
+-	if (!IS_ALIGNED(pgd_hva, pgd_size)) {
+-		ret = -EINVAL;
++	if (!IS_ALIGNED(pgd_hva, pgd_size))
+ 		goto err_unpin_kvm;
+-	}
+ 
+ 	ret = -ENOMEM;
+ 
+diff --git a/aosp/arch/x86/configs/gki_defconfig b/aosp/arch/x86/configs/gki_defconfig
+index a0fd8fbd9ba4..6a96ebd5cce1 100644
+--- a/aosp/arch/x86/configs/gki_defconfig
++++ b/aosp/aosp/arch/x86/configs/gki_defconfig
+@@ -540,7 +540,6 @@ CONFIG_ANDROID_BINDERFS=y
+ CONFIG_ANDROID_DEBUG_SYMBOLS=y
+ CONFIG_ANDROID_VENDOR_HOOKS=y
+ CONFIG_ANDROID_DEBUG_KINFO=y
+-CONFIG_ANDROID_WRAPFD=y
+ CONFIG_LIBNVDIMM=y
+ CONFIG_INTERCONNECT=y
+ CONFIG_EXT4_FS=y
+diff --git a/aosp/drivers/android/Kconfig b/aosp/drivers/android/Kconfig
+index 49ca23131c32..639cd9278a51 100644
+--- a/aosp/drivers/android/Kconfig
++++ b/aosp/aosp/drivers/android/Kconfig
+@@ -115,14 +115,4 @@ config ANDROID_VENDOR_OEM_DATA
+ 
+ 	  If even slightly unsure, say Y.
+ 
+-config ANDROID_WRAPFD
+-	bool "WrapFD Driver"
+-	depends on MMU
+-	help
+-	  Enable WrapFD driver to control ability to map a file
+-
+-	  WrapFD allows wrapping an fd representing a memory buffer into a new
+-	  file supporting ioctl API for file ownership that controls ability to
+-	  map the file.
+-
+ endmenu
+diff --git a/aosp/drivers/android/Makefile b/aosp/drivers/android/Makefile
+index 4a54d290e747..97cddb531ee0 100644
+--- a/aosp/drivers/android/Makefile
++++ b/aosp/aosp/drivers/android/Makefile
+@@ -7,4 +7,3 @@ obj-$(CONFIG_ANDROID_BINDER_IPC_SELFTEST) += binder_alloc_selftest.o
+ obj-$(CONFIG_ANDROID_DEBUG_SYMBOLS)	+= android_debug_symbols.o
+ obj-$(CONFIG_ANDROID_VENDOR_HOOKS) += vendor_hooks.o
+ obj-$(CONFIG_ANDROID_DEBUG_KINFO)	+= debug_kinfo.o
+-obj-$(CONFIG_ANDROID_WRAPFD)		+= wrapfd.o
+diff --git a/aosp/drivers/android/wrapfd.c b/aosp/drivers/android/wrapfd.c
+deleted file mode 100644
+index 578582ab0e41..000000000000
+--- a/aosp/drivers/android/wrapfd.c
++++ /dev/null
+@@ -1,1741 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/* wrapfd.c
+- *
+- * Wrapfd
+- *
+- * Copyright (C) 2025 Google, Inc.
+- */
+-
+-#include <linux/anon_inodes.h>
+-#include <linux/bvec.h>
+-#include <linux/compat.h>
+-#include <linux/dma-buf.h>
+-#include <linux/fdtable.h>
+-#include <linux/file.h>
+-#include <linux/fs.h>
+-#include <linux/miscdevice.h>
+-#include <linux/mm.h>
+-#include <linux/mman.h>
+-#include <linux/pagemap.h>
+-#include <linux/scatterlist.h>
+-#include <linux/seq_file.h>
+-#include <linux/spinlock.h>
+-#include <linux/uaccess.h>
+-#include <linux/uio.h>
+-#include <linux/wrapfd.h>
+-#include <uapi/linux/wrapfd.h>
+-
+-/* 1 buffer for the start, and at most 2 at the end. */
+-#define MAX_NR_BOUNCE_BUFS 3
+-
+-/* 1 per bounce page (3), and 1 for content read directly into the buffer. */
+-#define MAX_NR_KVECS (MAX_NR_BOUNCE_BUFS + 1)
+-
+-struct wrap_ctx;
+-struct wrap_content;
+-static const struct file_operations wrap_fops;
+-
+-struct wrap_content_operations {
+-	int (*create_wrap)(struct wrap_content *content, struct wrap_ctx *ctx);
+-	int (*load)(struct wrap_content *content, struct file *file,
+-		    loff_t file_offs, loff_t buf_offs, loff_t len);
+-	loff_t (*llseek)(struct wrap_content *content, loff_t offs, int whence);
+-	int (*mmap_prepare)(struct wrap_content *content,
+-			    struct vm_area_struct *vma);
+-	int (*mmap)(struct wrap_content *content, struct vm_area_struct *vma);
+-	void (*free)(struct wrap_content *content);
+-	struct wrap_content *(*make_writable)(struct wrap_content *content,
+-			      bool writable);
+-	bool (*is_writable)(struct wrap_content *content);
+-	void (*show_fdinfo)(struct wrap_content *content, struct seq_file *m);
+-	int (*get_mappable)(struct wrap_content *content, struct device *dev,
+-			    union wrapfd_mappable *mappable);
+-	void (*put_mappable)(struct wrap_content *content,
+-			    union wrapfd_mappable *mappable);
+-	int (*ioctl)(struct wrap_content *content,
+-		     unsigned int cmd, unsigned long arg);
+-};
+-
+-/* Abstract wrap content to be embedded in a concrete content object. */
+-struct wrap_content {
+-	struct wrap_content_operations *ops;
+-	bool close_on_exec;
+-};
+-
+-/* dmabuf content */
+-struct wrap_content_dmabuf {
+-	struct wrap_content content;
+-	struct dma_buf *dmabuf;
+-	bool writable;
+-};
+-
+-struct data_segment {
+-	loff_t offs;
+-	size_t len;
+-};
+-
+-struct wrap_io_ctx {
+-	u8 *bounce_bufs[MAX_NR_BOUNCE_BUFS];
+-	u8 *dst_buf;
+-	size_t start_bounce_len;
+-	size_t end_bounce_len;
+-	struct file *file;
+-	loff_t buf_offs;
+-	struct data_segment file_seg;
+-	/* The portion of the buffer that we read the file contents into without bouncing. */
+-	struct data_segment dio_buf_seg;
+-	long ret;
+-	size_t bytes_read;
+-	struct wrap_io_req *reqs;
+-	unsigned int nr_reqs;
+-	spinlock_t lock;
+-	struct completion io_done;
+-};
+-
+-struct wrap_io_req {
+-	struct kiocb kiocb;
+-	struct iov_iter iter;
+-	struct kvec iov[MAX_NR_KVECS];
+-	struct data_segment file_seg;
+-	struct wrap_io_ctx *io_ctx;
+-};
+-
+-struct dmabuf_load_param {
+-	struct dma_buf *dmabuf;
+-	struct iosys_map map;
+-	struct wrap_io_ctx io_ctx;
+-};
+-
+-static int nonzero_ulong_param_set(const char *val, const struct kernel_param *kp)
+-{
+-	unsigned long res;
+-	int ret = kstrtoul(val, 0, &res);
+-
+-	if (ret)
+-		return ret;
+-	if (!res)
+-		return -EINVAL;
+-	*((unsigned long *)kp->arg) = res;
+-	return 0;
+-}
+-
+-static const struct kernel_param_ops nonzero_param_ops = {
+-	.set = nonzero_ulong_param_set,
+-	.get = param_get_ulong,
+-};
+-
+-static unsigned long max_nr_load_reqs = 32;
+-module_param_cb(max_nr_load_reqs, &nonzero_param_ops, &max_nr_load_reqs, 0644);
+-
+-static unsigned long min_bytes_per_req = SZ_1M;
+-module_param_cb(min_bytes_per_req, &nonzero_param_ops, &min_bytes_per_req, 0644);
+-
+-static int dmabuf_content_create_wrap(struct wrap_content *content,
+-				      struct wrap_ctx *ctx)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-	struct file *file;
+-	int fd;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-
+-	fd = get_unused_fd_flags(0);
+-	if (fd < 0)
+-		return fd;
+-
+-	file = anon_inode_getfile_secure("[wrapfd]", &wrap_fops, ctx,
+-					 dmabuf_content->writable ? O_RDWR : O_RDONLY, NULL);
+-	if (IS_ERR(file)) {
+-		put_unused_fd(fd);
+-		return PTR_ERR(file);
+-	}
+-
+-	/*
+-	 * Anonymous inodes are created with size == 0. To ensure that calls
+-	 * like fstat() work as expected, copy the size from the buffer we are
+-	 * wrapping.
+-	 */
+-	i_size_write(file_inode(file), dmabuf_content->dmabuf->size);
+-	fd_install(fd, file);
+-
+-	return fd;
+-}
+-
+-static size_t dio_aligned_len(loff_t file_offs, size_t len)
+-{
+-	/*
+-	 * File offset and read length must be page aligned for direct I/O requests, so page align
+-	 * the start and end of the read to figure out how much we'll actually be reading from the
+-	 * file.
+-	 */
+-	return PAGE_ALIGN(file_offs + len) - PAGE_ALIGN_DOWN(file_offs);
+-}
+-
+-static void async_io_complete(struct kiocb *kiocb, long ret)
+-{
+-	struct wrap_io_req *req = container_of(kiocb, struct wrap_io_req, kiocb);
+-	struct wrap_io_ctx *io_ctx = req->io_ctx;
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&io_ctx->lock, flags);
+-	if (ret < 0 && !io_ctx->ret)
+-		io_ctx->ret = ret;
+-	else
+-		io_ctx->bytes_read += ret;
+-
+-	io_ctx->nr_reqs--;
+-
+-	if (!io_ctx->nr_reqs)
+-		complete(&io_ctx->io_done);
+-	spin_unlock_irqrestore(&io_ctx->lock, flags);
+-}
+-
+-static void init_io_req(struct wrap_io_ctx *io_ctx, struct wrap_io_req *req, loff_t req_file_offs,
+-			size_t req_len)
+-{
+-	unsigned int nr_segs = 0;
+-	loff_t global_file_offset;
+-	loff_t global_dio_file_offset;
+-
+-	/*
+-	 * These are global in the context of the overall I/O request. The first represents the
+-	 * offset into the file at which we start reading from for the overall request. The second
+-	 * is the offset at which we read from the file directly into the destination buffer.
+-	 */
+-	global_file_offset = PAGE_ALIGN_DOWN(io_ctx->file_seg.offs);
+-	global_dio_file_offset = global_file_offset + io_ctx->start_bounce_len;
+-
+-	init_sync_kiocb(&req->kiocb, io_ctx->file);
+-	req->kiocb.ki_pos = req_file_offs;
+-	req->kiocb.ki_flags |= IOCB_DIRECT;
+-	req->kiocb.ki_complete = async_io_complete;
+-	req->file_seg.offs = req_file_offs;
+-	req->file_seg.len = req_len;
+-	req->io_ctx = io_ctx;
+-
+-	/*
+-	 * If there's a start bounce buffer, it's always for the first page in the overall read
+-	 * request.
+-	 */
+-	if (io_ctx->start_bounce_len && (req_file_offs == global_file_offset)) {
+-		req->iov[nr_segs].iov_base = io_ctx->bounce_bufs[0];
+-		req->iov[nr_segs].iov_len = io_ctx->start_bounce_len;
+-		req_len -= io_ctx->start_bounce_len;
+-		req_file_offs += io_ctx->start_bounce_len;
+-		nr_segs++;
+-	}
+-
+-	/*
+-	 * Handle the case where the sub-request pertains to data copied directly from the file to
+-	 * the destination buffer.
+-	 */
+-	if (req_len && io_ctx->dio_buf_seg.len && global_dio_file_offset <= req_file_offs) {
+-		size_t dio_len;
+-
+-		/*
+-		 * The offset into the buffer for this request should be the base of where we start
+-		 * reading directly into it, plus how much we've already read into the region in
+-		 * previous requests.
+-		 */
+-		req->iov[nr_segs].iov_base = io_ctx->dst_buf + io_ctx->dio_buf_seg.offs +
+-					     (req_file_offs - global_dio_file_offset);
+-		/*
+-		 * The amount of data to read is the smaller of the two terms:
+-		 *
+-		 * 1. How much data is left for this request.
+-		 * 2. How much data there is left in the file region that gets loaded directly
+-		 * into the buffer, which is taken as the difference between the current position
+-		 * in the file and the end of that region.
+-		 */
+-		dio_len = min_t(size_t, req_len, global_dio_file_offset + io_ctx->dio_buf_seg.len -
+-				req_file_offs);
+-		req->iov[nr_segs].iov_len = dio_len;
+-		req_len -= dio_len;
+-		req_file_offs += dio_len;
+-		nr_segs++;
+-	}
+-
+-	if (req_len && io_ctx->end_bounce_len) {
+-		/*
+-		 * The offset into the file that is copied into the end bounce buffer(s) for the
+-		 * overall request.
+-		 */
+-		loff_t global_end_bounce_file_offs = global_file_offset +
+-						dio_aligned_len(io_ctx->file_seg.offs,
+-								io_ctx->file_seg.len) -
+-						io_ctx->end_bounce_len;
+-		int start_bounce_idx;
+-
+-		/*
+-		 * The last two pages in the overall read request can be bounce pages, so we
+-		 * calculate which pages to use here. If there's a bounce page at the beginning,
+-		 * then start at index 1.
+-		 *
+-		 * Since we know the file offset that corresponds to the start of the file data
+-		 * that will be copied into the end pages and the length, we use that and our
+-		 * current position to track which one of the end pages to use.
+-		 */
+-		start_bounce_idx = (io_ctx->start_bounce_len ? 1 : 0) +
+-				   ((req_file_offs - global_end_bounce_file_offs) / PAGE_SIZE);
+-
+-		WARN_ON(req_len > PAGE_SIZE * 2);
+-
+-		while (req_len) {
+-			req->iov[nr_segs].iov_base = io_ctx->bounce_bufs[start_bounce_idx];
+-			req->iov[nr_segs].iov_len = PAGE_SIZE;
+-			req_len -= PAGE_SIZE;
+-			nr_segs++;
+-			start_bounce_idx++;
+-		}
+-	}
+-
+-	WARN_ON(req_len);
+-
+-	iov_iter_kvec(&req->iter, ITER_DEST, req->iov, nr_segs, req->file_seg.len);
+-}
+-
+-static int prepare_read_reqs(struct wrap_io_ctx *io_ctx)
+-{
+-	struct wrap_io_req *reqs;
+-	unsigned int nr_reqs, i;
+-	loff_t cur_file_offs;
+-	size_t remaining_len = dio_aligned_len(io_ctx->file_seg.offs, io_ctx->file_seg.len);
+-	size_t len_per_req;
+-
+-	/*
+-	 * Try to split the I/O request evenly into MAX_NR_LOAD_REQS pieces, as long as each piece
+-	 * is at least MIN_BYTES_PER_REQ in size, but no larger than MAX_RW_COUNT, since the VFS
+-	 * layer cannot handle anything larger than that in one invocation.
+-	 *
+-	 * PAGE_ALIGN the length to ensure direct I/O requirements are upheld.
+-	 */
+-	len_per_req = PAGE_ALIGN(clamp_t(size_t, remaining_len / max_nr_load_reqs,
+-					 min_bytes_per_req, MAX_RW_COUNT));
+-
+-	nr_reqs = DIV_ROUND_UP(remaining_len, len_per_req);
+-
+-	/* nr_reqs could be large, so use kvcalloc() just in case. */
+-	reqs = kvcalloc(nr_reqs, sizeof(*reqs), GFP_KERNEL);
+-	if (!reqs)
+-		return -ENOMEM;
+-
+-	cur_file_offs = PAGE_ALIGN_DOWN(io_ctx->file_seg.offs);
+-
+-	for (i = 0; i < nr_reqs; i++) {
+-		size_t req_len = min(len_per_req, remaining_len);
+-
+-		init_io_req(io_ctx, &reqs[i], cur_file_offs, req_len);
+-		cur_file_offs += req_len;
+-		remaining_len -= req_len;
+-	}
+-
+-	io_ctx->reqs = reqs;
+-	io_ctx->nr_reqs = nr_reqs;
+-	return 0;
+-}
+-
+-/*
+- * Splits an I/O request into at most 4 segments: a start bounce page for when the file or
+- * buffer offsets are unaligned to avoid overwriting any of the existing data in the first page,
+- * a middle segment that writes directly into the buffer, and a final segment that covers the
+- * remainder with at most 2 bounce pages.
+- *
+- * When using bounce pages, a full page is copied from the file as part of the I/O request, and only
+- * the parts that are needed are copied into the buffer later. Since the first page of the I/O
+- * request may also need to be bounced, the middle segment of the I/O request, which is read
+- * directly into the buffer if there is enough space, may need to be moved back to its final
+- * destination, which also happens later.
+- *
+- * All of the logic to shuttle the buffer contents to their final destination is in
+- * wrap_io_complete().
+- */
+-static int wrap_io_prepare(struct file *file, loff_t file_offs, u8 *dst_buf, loff_t buf_offs,
+-			   loff_t len, struct wrap_io_ctx *io_ctx)
+-{
+-	u8 *bounce_bufs[MAX_NR_BOUNCE_BUFS] = {};
+-	size_t start_bounce_len = 0;
+-	loff_t dio_buf_offs = buf_offs;
+-	size_t dio_buf_len = 0;
+-	loff_t dio_buf_limit;
+-	size_t end_bounce_len;
+-	size_t nr_bounce_pages;
+-	size_t file_read_len = dio_aligned_len(file_offs, len);
+-	loff_t buf_end = buf_offs + len;
+-	int i, ret = 0;
+-
+-	/*
+-	 * If either the file or buffer offset are unaligned, then using direct I/O into the first
+-	 * page of the buffer will overwrite some of the data that is already there. Allocate a
+-	 * bounce page for that scenario, and later only copy the amount of data that belongs in the
+-	 * first page.
+-	 */
+-	if (!PAGE_ALIGNED(file_offs | buf_offs)) {
+-		/*
+-		 * The contents of interest in this bounce page will be copied to the buffer
+-		 * starting at buf_offs after the direct I/O request completes. The amount of data
+-		 * copied will be everything in the bounce page after file_offset bytes.
+-		 *
+-		 * Therefore, the next address where data needs to be read into is buf_offs +
+-		 * (PAGE_SIZE - offset_in_page(file_offs)). However, this address may not be
+-		 * page aligned, and therefore not suitable for direct I/O, so page align it.
+-		 *
+-		 * This means that the data will need to be shifted backwards if it is read into
+-		 * the buffer directly.
+-		 */
+-		dio_buf_offs = PAGE_ALIGN(buf_offs + PAGE_SIZE - offset_in_page(file_offs));
+-		start_bounce_len = PAGE_SIZE;
+-	}
+-
+-	/*
+-	 * Read as much as possible directly into the buffer without causing any overwrites beyond
+-	 * the range we're reading into, and since direct I/O is done in units of pages,
+-	 * ensure that there is at least a page to read.
+-	 */
+-	if (!check_sub_overflow(buf_end, PAGE_SIZE, &dio_buf_limit) &&
+-	    dio_buf_offs <= dio_buf_limit)
+-		dio_buf_len = PAGE_ALIGN_DOWN(buf_end) - dio_buf_offs;
+-
+-	/*
+-	 * Bounce the remainder, which is capped at 2 pages, since we may have shifted the data
+-	 * earlier, because of the buffer offset by at most one page, and then any other data
+-	 * at the tail which may cross into another page.
+-	 */
+-	end_bounce_len = file_read_len - start_bounce_len - dio_buf_len;
+-	WARN_ON(end_bounce_len > PAGE_SIZE * 2);
+-
+-	nr_bounce_pages = (start_bounce_len + end_bounce_len) / PAGE_SIZE;
+-	for (i = 0; i < nr_bounce_pages; i++) {
+-		bounce_bufs[i] = (u8 *)__get_free_page(GFP_KERNEL);
+-		if (!bounce_bufs[i]) {
+-			ret = -ENOMEM;
+-			goto err_free_bounce_pages;
+-		}
+-	}
+-
+-	memset(io_ctx, 0, sizeof(*io_ctx));
+-	memcpy(io_ctx->bounce_bufs, bounce_bufs, sizeof(io_ctx->bounce_bufs));
+-	io_ctx->dst_buf = dst_buf;
+-	io_ctx->start_bounce_len = start_bounce_len;
+-	io_ctx->end_bounce_len = end_bounce_len;
+-	io_ctx->file = file;
+-	io_ctx->buf_offs = buf_offs;
+-	io_ctx->file_seg.offs = file_offs;
+-	io_ctx->file_seg.len = len;
+-	io_ctx->dio_buf_seg.offs = dio_buf_offs;
+-	io_ctx->dio_buf_seg.len = dio_buf_len;
+-	spin_lock_init(&io_ctx->lock);
+-	init_completion(&io_ctx->io_done);
+-
+-	ret = prepare_read_reqs(io_ctx);
+-	if (ret)
+-		goto err_free_bounce_pages;
+-
+-	return 0;
+-
+-err_free_bounce_pages:
+-	/* free_page() checks that the provided address is not NULL. */
+-	for (i = 0; i < nr_bounce_pages; i++)
+-		free_page((unsigned long)bounce_bufs[i]);
+-	return ret;
+-
+-}
+-
+-static int wrap_io_read(struct wrap_io_ctx *io_ctx)
+-{
+-	ssize_t ret;
+-	unsigned int i, nr_reqs;
+-
+-	/*
+-	 * io_ctx->nr_reqs is manipulated from async_io_complete(), to determine when the I/O is
+-	 * complete, so cache it before it can be manipulated. No lock is required here since we
+-	 * haven't started reading anything yet.
+-	 */
+-	nr_reqs = io_ctx->nr_reqs;
+-
+-	for (i = 0; i < nr_reqs; i++) {
+-		struct wrap_io_req *req = &io_ctx->reqs[i];
+-
+-		/*
+-		 * ret == -EIOCBQUEUED => I/O request was queued successfully.
+-		 * ret >= 0 => I/O request was satisfied synchronously.
+-		 * ret < 0 => error.
+-		 *
+-		 * If an error is encountered, record the first one. We have to call
+-		 * async_io_complete() if the request is not being processed asynchronously to
+-		 * ensure that the nr_reqs context field is decremented properly so that we don't
+-		 * block indefinitely in the wait_for_completion() call later.
+-		 */
+-		ret = vfs_iocb_iter_read(io_ctx->file, &req->kiocb, &req->iter);
+-		if (ret != -EIOCBQUEUED)
+-			async_io_complete(&req->kiocb, ret);
+-	}
+-
+-	wait_for_completion(&io_ctx->io_done);
+-
+-	if (io_ctx->ret)
+-		return io_ctx->ret;
+-
+-	/* File was too short / early EOF. */
+-	return io_ctx->bytes_read < offset_in_page(io_ctx->file_seg.offs) + io_ctx->file_seg.len ?
+-	       -EINVAL : 0;
+-}
+-
+-static void wrap_io_complete(struct wrap_io_ctx *io_ctx)
+-{
+-	u8 *dst, *src, *dio_start;
+-	size_t tot_len, len;
+-	unsigned int cur_bounce_page = 0;
+-	loff_t file_offs = io_ctx->file_seg.offs;
+-	int i;
+-
+-	if (io_ctx->bytes_read < (offset_in_page(file_offs) + io_ctx->file_seg.len))
+-		goto out;
+-
+-	tot_len = io_ctx->file_seg.len;
+-	dst = io_ctx->dst_buf + io_ctx->buf_offs;
+-
+-	if (io_ctx->start_bounce_len) {
+-		src = io_ctx->bounce_bufs[cur_bounce_page] + offset_in_page(file_offs);
+-		/* Handle the case where all of the requested data is in the first bounce page. */
+-		len = min(tot_len, PAGE_SIZE - offset_in_page(file_offs));
+-		memcpy(dst, src, len);
+-		dst += len;
+-		tot_len -= len;
+-		cur_bounce_page++;
+-	}
+-
+-	if (io_ctx->dio_buf_seg.len) {
+-		dio_start = io_ctx->dst_buf + io_ctx->dio_buf_seg.offs;
+-		len = min(tot_len, io_ctx->dio_buf_seg.len);
+-
+-		/*
+-		 * If there's anything that was copied directly into the dmabuf, check to make sure
+-		 * it's in the right place. Shift it back if it's not.
+-		 */
+-		if (dio_start != dst)
+-			memmove(dst, dio_start, len);
+-
+-		dst += len;
+-		tot_len -= len;
+-	}
+-
+-	for (i = 0; i < io_ctx->end_bounce_len / PAGE_SIZE; i++) {
+-		src = io_ctx->bounce_bufs[cur_bounce_page];
+-		len = min_t(size_t, tot_len, PAGE_SIZE);
+-		memcpy(dst, src, len);
+-		dst += len;
+-		tot_len -= len;
+-		cur_bounce_page++;
+-	}
+-
+-	WARN_ON(tot_len);
+-
+-out:
+-	kvfree(io_ctx->reqs);
+-	for (i = 0; i < ((io_ctx->start_bounce_len + io_ctx->end_bounce_len) / PAGE_SIZE); i++)
+-		free_page((unsigned long)io_ctx->bounce_bufs[i]);
+-
+-}
+-
+-static int dmabuf_content_load_prepare(struct file *file, struct dma_buf *dmabuf, loff_t file_offs,
+-				       loff_t buf_offs, loff_t len, struct dmabuf_load_param *param)
+-{
+-	struct iosys_map map;
+-	loff_t buf_end;
+-	int ret;
+-
+-	/* We will only write into buf_offs + len, so no need to page-align the length here. */
+-	if (check_add_overflow(buf_offs, len, &buf_end))
+-		return -EINVAL;
+-
+-	if (buf_end > dmabuf->size)
+-		return -EINVAL;
+-
+-	ret = dma_buf_begin_cpu_access(dmabuf, DMA_BIDIRECTIONAL);
+-	if (ret)
+-		return ret;
+-
+-	ret = dma_buf_vmap(dmabuf, &map);
+-	if (ret)
+-		goto err_end_access;
+-
+-	if (map.is_iomem) {
+-		ret = -EINVAL;
+-		goto err_unmap;
+-	}
+-
+-	ret = wrap_io_prepare(file, file_offs, map.vaddr, buf_offs, len, &param->io_ctx);
+-	if (ret < 0)
+-		goto err_unmap;
+-
+-	param->dmabuf = dmabuf;
+-	param->map = map;
+-	return 0;
+-
+-err_unmap:
+-	dma_buf_vunmap(dmabuf, &map);
+-err_end_access:
+-	dma_buf_end_cpu_access(dmabuf, DMA_BIDIRECTIONAL);
+-	return ret;
+-}
+-
+-static void dmabuf_content_load_complete(struct dmabuf_load_param *param)
+-{
+-	wrap_io_complete(&param->io_ctx);
+-	dma_buf_vunmap(param->dmabuf, &param->map);
+-	dma_buf_end_cpu_access(param->dmabuf, DMA_BIDIRECTIONAL);
+-}
+-
+-static int dmabuf_content_load(struct wrap_content *content, struct file *file,
+-			       loff_t file_offs, loff_t buf_offs, loff_t len)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-	struct dmabuf_load_param param;
+-	int ret;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-	ret = dmabuf_content_load_prepare(file, dmabuf_content->dmabuf, file_offs, buf_offs, len,
+-					  &param);
+-	if (ret < 0)
+-		return ret;
+-
+-	ret = wrap_io_read(&param.io_ctx);
+-	dmabuf_content_load_complete(&param);
+-	return ret;
+-}
+-
+-static struct wrap_content *
+-dmabuf_content_make_writable(struct wrap_content *content, bool writable)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-	if (writable && !(dmabuf_content->dmabuf->file->f_mode & FMODE_WRITE))
+-		return ERR_PTR(-EACCES);
+-
+-	dmabuf_content->writable = writable;
+-
+-	return content;
+-}
+-
+-static bool dmabuf_content_is_writable(struct wrap_content *content)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-
+-	return dmabuf_content->writable && !!(dmabuf_content->dmabuf->file->f_mode & FMODE_WRITE);
+-}
+-
+-static loff_t dmabuf_content_llseek(struct wrap_content *content, loff_t offs, int whence)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-	struct file *file;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-	file = dmabuf_content->dmabuf->file;
+-
+-	return file->f_op->llseek(file, offs, whence);
+-}
+-
+-static int dmabuf_content_mmap(struct wrap_content *content,
+-			       struct vm_area_struct *vma)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-	int ret;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-
+-	ret = dma_buf_mmap(dmabuf_content->dmabuf, vma, vma->vm_pgoff);
+-	if (ret)
+-		return ret;
+-
+-	return 0;
+-}
+-
+-static void dmabuf_content_free(struct wrap_content *content)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-	if (dmabuf_content->dmabuf)
+-		dma_buf_put(dmabuf_content->dmabuf);
+-	kfree(dmabuf_content);
+-}
+-
+-static void dmabuf_content_show_fdinfo(struct wrap_content *content,
+-				       struct seq_file *m)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-	struct dma_buf *dmabuf;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-	seq_printf(m, "type:\tdmabuf\n");
+-
+-	dmabuf = dmabuf_content->dmabuf;
+-	seq_printf(m, "size:\t%zu\n", dmabuf->size);
+-	/* Don't count the temporary reference taken inside procfs seq_show */
+-	seq_printf(m, "count:\t%ld\n", file_count(dmabuf->file) - 1);
+-	seq_printf(m, "exp_name:\t%s\n", dmabuf->exp_name);
+-	spin_lock(&dmabuf->name_lock);
+-	if (dmabuf->name)
+-		seq_printf(m, "name:\t%s\n", dmabuf->name);
+-	spin_unlock(&dmabuf->name_lock);
+-}
+-
+-static int
+-dmabuf_content_get_mappable(struct wrap_content *content, struct device *dev,
+-			    union wrapfd_mappable *mappable)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-	mappable->dmabuf = dmabuf_content->dmabuf;
+-
+-	return 0;
+-}
+-
+-static int dmabuf_content_ioctl(struct wrap_content *content,
+-				unsigned int cmd, unsigned long arg)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-	struct file *file;
+-
+-	dmabuf_content = container_of(content, struct wrap_content_dmabuf,
+-				      content);
+-	file = dmabuf_content->dmabuf->file;
+-
+-	if (in_compat_syscall())
+-		return file->f_op->compat_ioctl(file, cmd, arg);
+-
+-	return file->f_op->unlocked_ioctl(file, cmd, arg);
+-
+-}
+-
+-static struct wrap_content_operations dmabuf_content_ops = {
+-	.create_wrap		= dmabuf_content_create_wrap,
+-	.load			= dmabuf_content_load,
+-	.llseek			= dmabuf_content_llseek,
+-	.mmap			= dmabuf_content_mmap,
+-	.make_writable		= dmabuf_content_make_writable,
+-	.is_writable		= dmabuf_content_is_writable,
+-	.free			= dmabuf_content_free,
+-	.show_fdinfo		= dmabuf_content_show_fdinfo,
+-	.get_mappable		= dmabuf_content_get_mappable,
+-	.ioctl			= dmabuf_content_ioctl,
+-};
+-
+-static struct wrap_content *alloc_dmabuf_content(struct dma_buf *dmabuf,
+-						 bool writable)
+-{
+-	struct wrap_content_dmabuf *dmabuf_content;
+-
+-	dmabuf_content = kmalloc(sizeof(*dmabuf_content), GFP_KERNEL);
+-	if (!dmabuf_content)
+-		return ERR_PTR(-ENOMEM);
+-
+-	get_dma_buf(dmabuf);
+-	dmabuf_content->dmabuf = dmabuf;
+-	dmabuf_content->writable = writable;
+-	dmabuf_content->content.ops = &dmabuf_content_ops;
+-
+-	return &dmabuf_content->content;
+-}
+-
+-/* Generic wrapfd */
+-struct wrap_owner {
+-	struct task_struct *task;
+-	struct device *dev;
+-};
+-
+-struct wrap_ctx_mapping {
+-	refcount_t refcnt;
+-	struct file *file;
+-	struct wrap_ctx *ctx;
+-	const struct vm_operations_struct *content_vm_ops;
+-	struct vm_operations_struct vm_ops;
+-};
+-
+-struct wrap_ctx {
+-	struct wrap_content *content;
+-	spinlock_t lock; /* protects all fields below */
+-	struct wrap_owner owner;
+-	bool allow_guests;
+-	unsigned long map_count;
+-	unsigned long use_count;
+-	bool unusable;
+-};
+-
+-static struct wrap_ctx *create_wrap_ctx(void)
+-{
+-	struct wrap_ctx *ctx;
+-
+-	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+-	if (!ctx)
+-		return NULL;
+-
+-	spin_lock_init(&ctx->lock);
+-
+-	return ctx;
+-}
+-
+-static inline void reset_owner(struct wrap_ctx *ctx)
+-{
+-	assert_spin_locked(&ctx->lock);
+-	put_task_struct(ctx->owner.task);
+-	ctx->owner.task = NULL;
+-}
+-
+-static inline struct task_struct *get_valid_owner(struct wrap_ctx *ctx)
+-{
+-	assert_spin_locked(&ctx->lock);
+-
+-	if (!ctx->owner.task)
+-		return NULL;
+-
+-	/* If task exits (passed exit_mm), reset the owner. */
+-	if (!ctx->owner.task->mm)
+-		reset_owner(ctx);
+-
+-	return ctx->owner.task;
+-}
+-
+-static inline bool has_owner(struct wrap_ctx *ctx)
+-{
+-	return get_valid_owner(ctx) || ctx->owner.dev;
+-}
+-
+-static inline bool is_owner_task(struct wrap_ctx *ctx,
+-				 struct task_struct *task)
+-{
+-	struct task_struct *owner_task = get_valid_owner(ctx);
+-
+-	return owner_task && task->group_leader == owner_task;
+-}
+-
+-static inline bool is_owner_dev(struct wrap_ctx *ctx,
+-				struct device *dev)
+-{
+-	assert_spin_locked(&ctx->lock);
+-	return ctx->owner.dev == dev;
+-}
+-
+-static inline int publish_wrap(struct wrap_ctx *ctx,
+-			       struct wrap_content *content)
+-{
+-	int ret;
+-
+-	ctx->content = content;
+-	ret = content->ops->create_wrap(content, ctx);
+-	/* Set FD_CLOEXEC flag for wrapfd the same as its content */
+-	if (ret >= 0)
+-		set_close_on_exec(ret, content->close_on_exec ? 1 : 0);
+-
+-	return ret;
+-}
+-
+-static bool context_use(struct wrap_ctx *ctx)
+-{
+-	assert_spin_locked(&ctx->lock);
+-	if (ctx->unusable)
+-		return false;
+-	ctx->use_count++;
+-	return true;
+-}
+-
+-static void context_unuse(struct wrap_ctx *ctx)
+-{
+-	assert_spin_locked(&ctx->lock);
+-	if (WARN_ON(ctx->unusable))
+-		return;
+-	ctx->use_count--;
+-}
+-
+-static int can_modify(struct wrap_ctx *ctx, struct task_struct *task,
+-		      bool check_content)
+-{
+-	assert_spin_locked(&ctx->lock);
+-	if (!is_owner_task(ctx, task))
+-		return -EBUSY;
+-
+-	if (ctx->map_count > 0 || ctx->use_count > 0)
+-		return -EINVAL;
+-
+-	if (check_content && !ctx->content)
+-		return -ENOENT;
+-
+-	return 0;
+-}
+-
+-static int block_usage(struct wrap_ctx *ctx)
+-{
+-	int ret;
+-
+-	assert_spin_locked(&ctx->lock);
+-	ret = can_modify(ctx, current, true);
+-	if (ret)
+-		return ret;
+-
+-	/*
+-	 * The task is the owner, the content can't be modified by other
+-	 * processes but racing threads of the owner process can still
+-	 * modify it. Use unusable to prevent that.
+-	 */
+-	if (ctx->unusable)
+-		return -EAGAIN;
+-
+-	ctx->unusable = true;
+-
+-	return 0;
+-}
+-
+-static void unblock_usage(struct wrap_ctx *ctx)
+-{
+-	assert_spin_locked(&ctx->lock);
+-	if (WARN_ON(!ctx->unusable))
+-		return;
+-
+-	ctx->unusable = false;
+-}
+-
+-static void wrap_vm_open(struct vm_area_struct *vma)
+-{
+-	struct wrap_ctx_mapping *mapping;
+-
+-	mapping = container_of(vma->vm_ops, struct wrap_ctx_mapping, vm_ops);
+-	if (mapping->content_vm_ops && mapping->content_vm_ops->open)
+-		mapping->content_vm_ops->open(vma);
+-
+-	spin_lock(&mapping->ctx->lock);
+-	mapping->ctx->map_count++;
+-	refcount_inc(&mapping->refcnt);
+-	spin_unlock(&mapping->ctx->lock);
+-}
+-
+-static void wrap_vm_close(struct vm_area_struct *vma)
+-{
+-	struct wrap_ctx_mapping *mapping;
+-	struct file *file = NULL;
+-	struct wrap_ctx *ctx;
+-
+-	mapping = container_of(vma->vm_ops, struct wrap_ctx_mapping, vm_ops);
+-	if (mapping->content_vm_ops && mapping->content_vm_ops->close)
+-		mapping->content_vm_ops->close(vma);
+-
+-	ctx = mapping->ctx;
+-	spin_lock(&ctx->lock);
+-	if (ctx->map_count > 0)
+-		ctx->map_count--;
+-	else
+-		pr_warn("wrapfd map count underflow\n");
+-	if (refcount_dec_and_test(&mapping->refcnt)) {
+-		if (mapping->file)
+-			file = mapping->file;
+-		kfree(mapping);
+-	}
+-	spin_unlock(&ctx->lock);
+-	if (file)
+-		fput(file);
+-}
+-
+-static int wrap_mmap(struct file *file, struct vm_area_struct *vma)
+-{
+-	struct wrap_ctx *ctx = file->private_data;
+-	struct wrap_ctx_mapping *mapping;
+-	struct wrap_content *content;
+-	bool make_rdonly = false;
+-	int ret = 0;
+-
+-	spin_lock(&ctx->lock);
+-	if (!ctx->allow_guests && has_owner(ctx) &&
+-	    !is_owner_task(ctx, current)) {
+-		ret = -EBUSY;
+-		goto unlock;
+-	}
+-
+-	/*
+-	 * If usage is blocked, the content is being rewrapped or emptied.
+-	 * Treat this as if the wrap is already empty.
+-	 */
+-	if (!context_use(ctx)) {
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
+-
+-	content = ctx->content;
+-	if (!content) {
+-		ret = -ENOENT;
+-		goto put_ctx;
+-	}
+-
+-	/* Handle read-only content */
+-	if (content->ops->is_writable &&
+-	    !content->ops->is_writable(content)) {
+-		if (vma->vm_flags & VM_WRITE) {
+-			ret = -EACCES;
+-			goto put_ctx;
+-		}
+-		make_rdonly = !!(vma->vm_flags & VM_MAYWRITE);
+-	}
+-
+-	if (content->ops->mmap_prepare) {
+-		ret = content->ops->mmap_prepare(content, vma);
+-		if (ret) {
+-			ret = -EINVAL;
+-			goto put_ctx;
+-		}
+-	}
+-	/*
+-	 * Increased map_count prevents changes in the
+-	 * ownership, rewrapping or emptying the content.
+-	 * Content is stable.
+-	 */
+-	ctx->map_count++;
+-put_ctx:
+-	context_unuse(ctx);
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	if (ret)
+-		goto err;
+-
+-	/* If we reached here then ctx->map_count has been incremented */
+-	mapping = kzalloc(sizeof(*mapping), GFP_KERNEL);
+-	if (!mapping) {
+-		ret = -ENOMEM;
+-		goto err_dec;
+-	}
+-
+-	ret = content->ops->mmap(content, vma);
+-	if (ret)
+-		goto err_free_mapping;
+-
+-	if (make_rdonly) {
+-		/*
+-		 * content->ops->mmap should not be mapping read-only content
+-		 * as writable. Either content->ops->is_writable reports
+-		 * incorrect value or content->ops->mmap is misbehaving.
+-		 */
+-		if (unlikely(vma->vm_flags & VM_WRITE)) {
+-			pr_warn("wrapfd read-only content was mapped as writable\n");
+-			ret = -EACCES;
+-			goto err_free_mapping;
+-		}
+-		vm_flags_clear(vma, VM_MAYWRITE);
+-	}
+-
+-	spin_lock(&ctx->lock);
+-	mapping->content_vm_ops = vma->vm_ops;
+-	if (vma->vm_ops)
+-		mapping->vm_ops = *vma->vm_ops;
+-	mapping->vm_ops.open = wrap_vm_open;
+-	mapping->vm_ops.close = wrap_vm_close;
+-	vma->vm_ops = &mapping->vm_ops;
+-	mapping->ctx = ctx;
+-	refcount_set(&mapping->refcnt, 1);
+-	/*
+-	 * content->ops->mmap might replace original vma->vm_file and vma will
+-	 * lose its association with the wrapfd file. In such cases we need to
+-	 * take a reference on the wrapfd file and store it to drop the
+-	 * refcount mapping is removed.
+-	 */
+-	if (vma->vm_file != file)
+-		mapping->file = get_file(file);
+-	spin_unlock(&ctx->lock);
+-
+-	return 0;
+-err_free_mapping:
+-	kfree(mapping);
+-err_dec:
+-	spin_lock(&ctx->lock);
+-	ctx->map_count--;
+-	spin_unlock(&ctx->lock);
+-err:
+-	return ret;
+-}
+-
+-static loff_t wrap_llseek(struct file *file, loff_t offs, int whence)
+-{
+-	struct wrap_ctx *ctx = file->private_data;
+-	struct wrap_content *content;
+-	loff_t ret = 0;
+-
+-	spin_lock(&ctx->lock);
+-	/*
+-	 * If usage is blocked, the content is being rewrapped or emptied.
+-	 * Treat this as if the wrap is already empty.
+-	 */
+-	if (!context_use(ctx)) {
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
+-
+-	content = ctx->content;
+-	if (!content) {
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
+-
+-	if (!content->ops->llseek) {
+-		ret = -ESPIPE;
+-		goto unlock;
+-	}
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	if (ret)
+-		return ret;
+-
+-	ret = content->ops->llseek(content, offs, whence);
+-
+-	spin_lock(&ctx->lock);
+-	context_unuse(ctx);
+-	spin_unlock(&ctx->lock);
+-
+-	return ret;
+-}
+-
+-static int wrap_release(struct inode *ignored, struct file *file)
+-{
+-	struct wrap_ctx *ctx = file->private_data;
+-
+-	if (ctx->content)
+-		ctx->content->ops->free(ctx->content);
+-	kfree(ctx);
+-
+-	return 0;
+-}
+-
+-static int get_wrap_state(struct wrap_ctx *ctx,
+-			  struct wrapfd_get_state __user *user_wrapfd_get_state)
+-{
+-	struct wrapfd_get_state wrapfd_get_state;
+-
+-	if (copy_from_user(&wrapfd_get_state, user_wrapfd_get_state,
+-			   sizeof(wrapfd_get_state)))
+-		return -EFAULT;
+-
+-	if (wrapfd_get_state.reserved || wrapfd_get_state.pad)
+-		return -EINVAL;
+-
+-	spin_lock(&ctx->lock);
+-	/*
+-	 * If usage is blocked, the content is being rewrapped or emptied.
+-	 * Treat this as if the wrap is already empty.
+-	 */
+-	if (ctx->content && context_use(ctx)) {
+-		if (ctx->content->ops->is_writable(ctx->content))
+-			wrapfd_get_state.state = WRAPFD_CONTENT_RDWR;
+-		else
+-			wrapfd_get_state.state = WRAPFD_CONTENT_RDONLY;
+-		context_unuse(ctx);
+-	} else {
+-		wrapfd_get_state.state = WRAPFD_CONTENT_EMPTY;
+-	}
+-	spin_unlock(&ctx->lock);
+-
+-	if (copy_to_user(user_wrapfd_get_state, &wrapfd_get_state,
+-			 sizeof(wrapfd_get_state)))
+-		return -EFAULT;
+-
+-	return 0;
+-}
+-
+-static int wrap_file_acquire_ownership(struct wrap_ctx *ctx)
+-{
+-	int ret = 0;
+-
+-	spin_lock(&ctx->lock);
+-
+-	if (is_owner_task(ctx, current))
+-		goto unlock;
+-
+-	if (has_owner(ctx)) {
+-		ret = -EBUSY;
+-		goto unlock;
+-	}
+-
+-	if (ctx->map_count > 0 || ctx->use_count > 0) {
+-		ret = -EINVAL;
+-		goto unlock;
+-	}
+-
+-	if (!ctx->content) {
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
+-
+-	ctx->owner.task = get_task_struct(current->group_leader);
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	return ret;
+-}
+-
+-static int wrap_file_release_ownership(struct wrap_ctx *ctx)
+-{
+-	int ret = 0;
+-
+-	spin_lock(&ctx->lock);
+-
+-	ret = can_modify(ctx, current, false);
+-	if (ret)
+-		goto unlock;
+-
+-	reset_owner(ctx);
+-	ctx->allow_guests = false;
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	return ret;
+-}
+-
+-static int wrap_file_load(struct wrap_ctx *ctx,
+-			  struct wrapfd_load __user *user_wrapfd_load)
+-{
+-	struct wrapfd_load wrapfd_load;
+-	struct wrap_content *content;
+-	struct file *file;
+-	loff_t file_offs;
+-	loff_t buf_offs;
+-	loff_t len;
+-	loff_t end;
+-	int ret = 0;
+-
+-	if (copy_from_user(&wrapfd_load, user_wrapfd_load,
+-			   sizeof(wrapfd_load)))
+-		return -EFAULT;
+-
+-	file_offs = wrapfd_load.file_offs;
+-	buf_offs = wrapfd_load.buf_offs;
+-	len = wrapfd_load.len;
+-
+-	if (file_offs < 0 || buf_offs < 0 || len < 0)
+-		return -EINVAL;
+-
+-	if (wrapfd_load.reserved || wrapfd_load.pad)
+-		return -EINVAL;
+-
+-	file = fget(wrapfd_load.fd);
+-	if (!file)
+-		return -EBADF;
+-
+-	if (!(file->f_mode & FMODE_READ)) {
+-		ret = -EBADF;
+-		goto put_file;
+-	}
+-
+-	if (!file->f_op->read_iter) {
+-		ret = -EINVAL;
+-		goto put_file;
+-	}
+-
+-	if (!(file->f_mode & FMODE_CAN_READ)) {
+-		ret = -EINVAL;
+-		goto put_file;
+-	}
+-
+-	if (!(file->f_mode & FMODE_CAN_ODIRECT)) {
+-		ret = -EINVAL;
+-		goto put_file;
+-	}
+-
+-	if (check_add_overflow(file_offs, len, &end)) {
+-		ret = -EINVAL;
+-		goto put_file;
+-	}
+-
+-	if (end > i_size_read(file_inode(file))) {
+-		ret = -EINVAL;
+-		goto put_file;
+-	}
+-
+-	spin_lock(&ctx->lock);
+-	ret = context_use(ctx) ? 0 : -ENOENT;
+-	spin_unlock(&ctx->lock);
+-
+-	if (ret)
+-		goto put_file;
+-
+-	content = ctx->content;
+-	if (!content) {
+-		ret = -ENOENT;
+-		goto put_ctx;
+-	}
+-
+-	if (content->ops->is_writable && !content->ops->is_writable(content)) {
+-		ret = -EACCES;
+-		goto put_ctx;
+-	}
+-
+-	ret = content->ops->load(content, file, file_offs, buf_offs, len);
+-put_ctx:
+-	spin_lock(&ctx->lock);
+-	context_unuse(ctx);
+-	spin_unlock(&ctx->lock);
+-put_file:
+-	fput(file);
+-
+-	return ret;
+-}
+-
+-static int wrap_file_rewrap(struct wrap_ctx *ctx,
+-			    struct wrapfd_rewrap __user *user_wrapfd_rewrap)
+-{
+-	struct wrapfd_rewrap wrapfd_rewrap;
+-	struct wrap_content *new_content;
+-	struct wrap_content *content;
+-	struct wrap_ctx *new_ctx;
+-	int ret = 0;
+-
+-	if (copy_from_user(&wrapfd_rewrap, user_wrapfd_rewrap,
+-			   sizeof(wrapfd_rewrap)))
+-		return -EFAULT;
+-
+-	if (wrapfd_rewrap.prot & ~(PROT_WRITE | PROT_READ))
+-		return -EINVAL;
+-
+-	if (wrapfd_rewrap.reserved || wrapfd_rewrap.pad)
+-		return -EINVAL;
+-
+-	spin_lock(&ctx->lock);
+-	ret = block_usage(ctx);
+-	if (!ret) {
+-		content = ctx->content;
+-		ctx->content = NULL;
+-	}
+-	spin_unlock(&ctx->lock);
+-
+-	if (ret)
+-		goto out;
+-
+-	new_content = content->ops->make_writable(content,
+-				(wrapfd_rewrap.prot & PROT_WRITE) != 0);
+-	if (IS_ERR(new_content)) {
+-		ret = PTR_ERR(new_content);
+-		goto restore_content;
+-	}
+-	new_content->close_on_exec = content->close_on_exec;
+-
+-	new_ctx = create_wrap_ctx();
+-	if (!new_ctx) {
+-		ret = -ENOMEM;
+-		goto free_new_content;
+-	}
+-
+-	ret = publish_wrap(new_ctx, new_content);
+-	if (ret < 0)
+-		goto free_new_ctx;
+-
+-	if (new_content != content)
+-		content->ops->free(content);
+-
+-	spin_lock(&ctx->lock);
+-	unblock_usage(ctx);
+-	spin_unlock(&ctx->lock);
+-
+-	return ret;
+-
+-free_new_ctx:
+-	kfree(new_ctx);
+-free_new_content:
+-	if (new_content != content)
+-		new_content->ops->free(new_content);
+-restore_content:
+-	/*
+-	 * Restore original wrap. We are the owner and the wrap
+-	 * is empty, so it could not have changed from under us.
+-	 */
+-	spin_lock(&ctx->lock);
+-	ctx->content = content;
+-	unblock_usage(ctx);
+-	spin_unlock(&ctx->lock);
+-out:
+-	return ret;
+-}
+-
+-static int wrap_file_empty(struct wrap_ctx *ctx)
+-{
+-	struct wrap_content *content;
+-	int ret = 0;
+-
+-	spin_lock(&ctx->lock);
+-
+-	ret = block_usage(ctx);
+-	if (ret)
+-		goto unlock;
+-
+-	content = ctx->content;
+-	ctx->content = NULL;
+-	unblock_usage(ctx);
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	if (!ret)
+-		content->ops->free(content);
+-
+-	return ret;
+-}
+-
+-static int wrap_file_allow_guests(struct wrap_ctx *ctx, bool allow)
+-{
+-	int ret = 0;
+-
+-	spin_lock(&ctx->lock);
+-
+-	ret = can_modify(ctx, current, true);
+-	if (ret)
+-		goto unlock;
+-
+-	ctx->allow_guests = allow;
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	return ret;
+-}
+-
+-static int wrap_file_ioctl(struct wrap_ctx *ctx,
+-			   unsigned int cmd, unsigned long arg)
+-{
+-	int ret = 0;
+-
+-	spin_lock(&ctx->lock);
+-	if (!ctx->allow_guests && has_owner(ctx) &&
+-	    !is_owner_task(ctx, current)) {
+-		ret = -EBUSY;
+-		goto unlock;
+-	}
+-
+-	/*
+-	 * If usage is blocked, the content is being rewrapped or emptied.
+-	 * Treat this as if the wrap is already empty.
+-	 */
+-	if (!context_use(ctx)) {
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
+-
+-	if (!ctx->content) {
+-		context_unuse(ctx);
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
+-
+-	if (!ctx->content->ops->ioctl) {
+-		context_unuse(ctx);
+-		ret = -ENOIOCTLCMD;
+-		goto unlock;
+-	}
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	if (ret)
+-		return ret;
+-
+-	ret = ctx->content->ops->ioctl(ctx->content, cmd, arg);
+-
+-	spin_lock(&ctx->lock);
+-	context_unuse(ctx);
+-	spin_unlock(&ctx->lock);
+-
+-	return ret;
+-}
+-
+-static long wrap_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+-{
+-	struct wrap_ctx *ctx = file->private_data;
+-	long ret;
+-
+-	switch (cmd) {
+-	case WRAPFD_DEV_IOC_GET_STATE:
+-		ret = get_wrap_state(ctx,
+-				     (struct wrapfd_get_state __user *)arg);
+-		break;
+-	case WRAPFD_DEV_IOC_ACQUIRE_OWNERSHIP:
+-		ret = wrap_file_acquire_ownership(ctx);
+-		break;
+-	case WRAPFD_DEV_IOC_RELEASE_OWNERSHIP:
+-		ret = wrap_file_release_ownership(ctx);
+-		break;
+-	case WRAPFD_DEV_IOC_LOAD:
+-		ret = wrap_file_load(ctx, (struct wrapfd_load __user *)arg);
+-		break;
+-	case WRAPFD_DEV_IOC_REWRAP:
+-		ret = wrap_file_rewrap(ctx,
+-				       (struct wrapfd_rewrap __user *)arg);
+-		break;
+-	case WRAPFD_DEV_IOC_EMPTY:
+-		ret = wrap_file_empty(ctx);
+-		break;
+-	case WRAPFD_DEV_IOC_ALLOW_GUESTS:
+-		ret = wrap_file_allow_guests(ctx, true);
+-		break;
+-	case WRAPFD_DEV_IOC_PROHIBIT_GUESTS:
+-		ret = wrap_file_allow_guests(ctx, false);
+-		break;
+-	default:
+-		ret = wrap_file_ioctl(ctx, cmd, arg);
+-		break;
+-	}
+-
+-	return ret;
+-}
+-
+-static long wrap_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+-{
+-	/* These commands are associated with pointers as arguments, so use compat_ptr() on them. */
+-	switch (cmd) {
+-	case WRAPFD_DEV_IOC_GET_STATE:
+-	case WRAPFD_DEV_IOC_LOAD:
+-	case WRAPFD_DEV_IOC_REWRAP:
+-		arg = (unsigned long)compat_ptr(arg);
+-		break;
+-	}
+-
+-	return wrap_ioctl(file, cmd, arg);
+-}
+-
+-#ifdef CONFIG_PROC_FS
+-static void wrap_show_fdinfo(struct seq_file *m, struct file *file)
+-{
+-	struct wrap_ctx *ctx = file->private_data;
+-	struct task_struct *owner_task;
+-
+-	spin_lock(&ctx->lock);
+-	owner_task = get_valid_owner(ctx);
+-	if (owner_task) {
+-		seq_printf(m, "owner:\t%d\n", owner_task->pid);
+-	} else {
+-		if (ctx->owner.dev)
+-			seq_printf(m, "owner:\t<device>\n");
+-		else
+-			seq_printf(m, "owner:\t<none>\n");
+-	}
+-	seq_printf(m, "guests:\t%s\n", ctx->allow_guests ? "yes" : "no");
+-	seq_printf(m, "maps:\t%lu\n", ctx->map_count);
+-	seq_printf(m, "empty:\t%s\n", ctx->content ? "no" : "yes");
+-	if (ctx->content) {
+-		struct wrap_content *content = ctx->content;
+-
+-		seq_printf(m, "rdonly:\t%s\n",
+-			   content->ops->is_writable(content) ? "no" : "yes");
+-		content->ops->show_fdinfo(content, m);
+-	}
+-	spin_unlock(&ctx->lock);
+-}
+-#endif
+-
+-bool is_wrapfd_vma(struct vm_area_struct *vma)
+-{
+-	return vma && vma->vm_ops && (vma->vm_ops->open == wrap_vm_open);
+-}
+-
+-int wrapfd_get_mappable(struct file *file, struct device *dev,
+-			union wrapfd_mappable *mappable)
+-{
+-	struct wrap_ctx *ctx;
+-	int ret;
+-
+-	if (WARN_ON(!dev))
+-		return -ENODEV;
+-
+-	if (file->f_op != &wrap_fops)
+-		return -EBADF;
+-
+-	ctx = file->private_data;
+-
+-	spin_lock(&ctx->lock);
+-
+-	if (has_owner(ctx) && !is_owner_dev(ctx, dev)) {
+-		ret = -EBUSY;
+-		goto unlock;
+-	}
+-
+-	if (ctx->map_count > 0 || ctx->use_count > 0) {
+-		ret = -EINVAL;
+-		goto unlock;
+-	}
+-
+-	if (!ctx->content) {
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
+-
+-	ctx->owner.dev = dev;
+-	/* Device is the owner, context can't change from under us. */
+-	ret = 0;
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	if (!ret) {
+-		ret = ctx->content->ops->get_mappable(ctx->content, dev,
+-						      mappable);
+-		if (ret) {
+-			spin_lock(&ctx->lock);
+-			ctx->owner.dev = NULL;
+-			spin_unlock(&ctx->lock);
+-		}
+-	}
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL_GPL(wrapfd_get_mappable);
+-
+-int wrapfd_put_mappable(struct file *file, struct device *dev,
+-			union wrapfd_mappable *mappable)
+-{
+-	struct wrap_ctx *ctx;
+-	int ret;
+-
+-	if (WARN_ON(!dev))
+-		return -ENODEV;
+-
+-	if (file->f_op != &wrap_fops)
+-		return -EBADF;
+-
+-	ctx = file->private_data;
+-
+-	spin_lock(&ctx->lock);
+-
+-	if (!is_owner_dev(ctx, dev)) {
+-		ret = -EBUSY;
+-		goto unlock;
+-	}
+-
+-	ctx->owner.dev = NULL;
+-	ret = 0;
+-unlock:
+-	spin_unlock(&ctx->lock);
+-
+-	if (!ret && ctx->content->ops->put_mappable)
+-		ctx->content->ops->put_mappable(ctx->content, mappable);
+-
+-	return ret;
+-}
+-EXPORT_SYMBOL_GPL(wrapfd_put_mappable);
+-
+-static const struct file_operations wrap_fops = {
+-	.owner		= THIS_MODULE,
+-	.llseek		= wrap_llseek,
+-	.mmap		= wrap_mmap,
+-	.release	= wrap_release,
+-	.unlocked_ioctl	= wrap_ioctl,
+-	.compat_ioctl	= wrap_compat_ioctl,
+-#ifdef CONFIG_PROC_FS
+-	.show_fdinfo	= wrap_show_fdinfo,
+-#endif
+-};
+-
+-static struct wrap_content *create_content_for(int fd, unsigned long prot)
+-{
+-	bool is_file_writable, writable;
+-	struct wrap_content *content;
+-	struct dma_buf *dmabuf;
+-
+-	dmabuf = dma_buf_get(fd);
+-	if (IS_ERR(dmabuf))
+-		return ERR_PTR(PTR_ERR(dmabuf));
+-
+-	writable = !!(prot & PROT_WRITE);
+-	is_file_writable = !!(dmabuf->file->f_mode & FMODE_WRITE);
+-	if (writable && !is_file_writable)
+-		content = ERR_PTR(-EACCES);
+-	else
+-		content = alloc_dmabuf_content(dmabuf, writable);
+-	dma_buf_put(dmabuf);
+-
+-	return content;
+-}
+-
+-static int wrap_file(struct wrap_ctx *ctx,
+-		     struct wrapfd_wrap __user *user_wrapfd_wrap)
+-{
+-	struct wrapfd_wrap wrapfd_wrap;
+-	struct wrap_content *content;
+-	int wrapfd;
+-
+-	if (copy_from_user(&wrapfd_wrap, user_wrapfd_wrap,
+-			   sizeof(wrapfd_wrap)))
+-		return -EFAULT;
+-
+-	if (wrapfd_wrap.prot & ~(PROT_WRITE | PROT_READ))
+-		return -EINVAL;
+-
+-	if (wrapfd_wrap.reserved)
+-		return -EINVAL;
+-
+-	content = create_content_for(wrapfd_wrap.fd, wrapfd_wrap.prot);
+-	if (IS_ERR(content))
+-		return PTR_ERR(content);
+-
+-	content->close_on_exec = get_close_on_exec(wrapfd_wrap.fd);
+-	wrapfd = publish_wrap(ctx, content);
+-	if (wrapfd < 0) {
+-		ctx->content = NULL;
+-		content->ops->free(content);
+-	}
+-
+-	return wrapfd;
+-}
+-
+-static long wrapfd_dev_ioctl(struct file *file, unsigned int cmd,
+-			     unsigned long arg)
+-{
+-	struct wrap_ctx *ctx;
+-	int ret;
+-
+-	VM_WARN_ON_ONCE(!current->mm);
+-
+-	switch (cmd) {
+-	case WRAPFD_DEV_IOC_WRAP:
+-		ctx = create_wrap_ctx();
+-		if (!ctx)
+-			return -ENOMEM;
+-
+-		ret = wrap_file(ctx, (struct wrapfd_wrap __user *)arg);
+-		if (ret < 0)
+-			kfree(ctx);
+-
+-		break;
+-	default:
+-		return -ENOIOCTLCMD;
+-	}
+-
+-	return ret;
+-}
+-
+-static const struct file_operations wrapfd_dev_fops = {
+-	.owner = THIS_MODULE,
+-	.unlocked_ioctl = wrapfd_dev_ioctl,
+-	.compat_ioctl = compat_ptr_ioctl,
+-	.llseek = noop_llseek,
+-};
+-
+-static struct miscdevice wrapfd_misc = {
+-	.minor = MISC_DYNAMIC_MINOR,
+-	.name = "wrapfd",
+-	.fops = &wrapfd_dev_fops,
+-};
+-
+-static int __init wrapfd_init(void)
+-{
+-	int ret;
+-
+-	ret = misc_register(&wrapfd_misc);
+-	if (ret) {
+-		pr_err("failed to register misc device!\n");
+-		return ret;
+-	}
+-
+-	return 0;
+-}
+-device_initcall(wrapfd_init);
+diff --git a/aosp/drivers/usb/gadget/udc/core.c b/aosp/drivers/usb/gadget/udc/core.c
+index 84a6183b4b79..10cd9ff74d62 100644
+--- a/aosp/drivers/usb/gadget/udc/core.c
++++ b/aosp/aosp/drivers/usb/gadget/udc/core.c
+@@ -28,18 +28,11 @@ static DEFINE_IDA(gadget_id_numbers);
+ 
+ static struct bus_type gadget_bus_type;
+ 
+-/*
+- * ANDROID: Global lock used instead of a per-gadget lock to maintain KABI
+- * compatibility. Serializes state changes during gadget teardown.
+- */
+-static DEFINE_SPINLOCK(android_udc_state_lock);
+-
+ /**
+  * struct usb_udc - describes one usb device controller
+  * @driver: the gadget driver pointer. For use by the class code
+- * @gadget: the gadget. For use by the class code
+- * @gadget_release: the gadget's release routine
+  * @dev: the child device to the actual controller
++ * @gadget: the gadget. For use by the class code
+  * @list: for use by the udc class driver
+  * @vbus: for udcs who care about vbus status, this value is real vbus status;
+  * for udcs who do not care about vbus status, this value is always true
+@@ -47,8 +40,6 @@ static DEFINE_SPINLOCK(android_udc_state_lock);
+  * @allow_connect: Indicates whether UDC is allowed to be pulled up.
+  * Set/cleared by gadget_(un)bind_driver() after gadget driver is bound or
+  * unbound.
+- * @teardown: True if the device is undergoing teardown, used to prevent
+- * new work from being scheduled during cleanup.
+  * @vbus_work: work routine to handle VBUS status change notifications.
+  * @connect_lock: protects udc->started, gadget->connect,
+  * gadget->allow_connect and gadget->deactivate. The routines
+@@ -62,13 +53,11 @@ static DEFINE_SPINLOCK(android_udc_state_lock);
+ struct usb_udc {
+ 	struct usb_gadget_driver	*driver;
+ 	struct usb_gadget		*gadget;
+-	void				(*gadget_release)(struct device *dev);
+ 	struct device			dev;
+ 	struct list_head		list;
+ 	bool				vbus;
+ 	bool				started;
+ 	bool				allow_connect;
+-	bool				teardown;
+ 	struct work_struct		vbus_work;
+ 	struct mutex			connect_lock;
+ };
+@@ -1113,15 +1102,8 @@ static void usb_gadget_state_work(struct work_struct *work)
+ void usb_gadget_set_state(struct usb_gadget *gadget,
+ 		enum usb_device_state state)
+ {
+-	struct usb_udc *udc;
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&android_udc_state_lock, flags);
+ 	gadget->state = state;
+-	udc = gadget->udc;
+-	if (udc && !udc->teardown)
+-		schedule_work(&gadget->work);
+-	spin_unlock_irqrestore(&android_udc_state_lock, flags);
++	schedule_work(&gadget->work);
+ 	trace_usb_gadget_set_state(gadget, 0);
+ }
+ EXPORT_SYMBOL_GPL(usb_gadget_set_state);
+@@ -1345,17 +1327,6 @@ static void usb_udc_nop_release(struct device *dev)
+ 	dev_vdbg(dev, "%s\n", __func__);
+ }
+ 
+-static void usb_gadget_release(struct device *dev)
+-{
+-	struct usb_gadget *gadget = dev_to_usb_gadget(dev);
+-	struct usb_udc *udc = gadget->udc;
+-	/* Cache the gadget's release routine to prevent UAF */
+-	void (*release)(struct device *dev) = udc->gadget_release;
+-
+-	put_device(&udc->dev);
+-	release(dev);
+-}
+-
+ /**
+  * usb_initialize_gadget - initialize a gadget and its embedded struct device
+  * @parent: the parent device to this udc. Usually the controller driver's
+@@ -1410,14 +1381,6 @@ int usb_add_gadget(struct usb_gadget *gadget)
+ 	mutex_init(&udc->connect_lock);
+ 
+ 	udc->started = false;
+-	/*
+-	 * Align decoupled lifecycles: take a UDC reference to ensure it
+-	 * remains allocated until the gadget is released, requiring an
+-	 * override of the gadget's release routine to drop it.
+-	 */
+-	udc->gadget_release = gadget->dev.release;
+-	gadget->dev.release = usb_gadget_release;
+-	get_device(&udc->dev);
+ 
+ 	mutex_lock(&udc_lock);
+ 	list_add_tail(&udc->list, &udc_list);
+@@ -1462,12 +1425,6 @@ int usb_add_gadget(struct usb_gadget *gadget)
+ 	mutex_lock(&udc_lock);
+ 	list_del(&udc->list);
+ 	mutex_unlock(&udc_lock);
+-	/*
+-	 * Revert the override and drop the UDC reference to prevent
+-	 * leaking the UDC if the gadget was statically allocated.
+-	 */
+-	gadget->dev.release = udc->gadget_release;
+-	put_device(&udc->dev);
+ 
+  err_put_udc:
+ 	put_device(&udc->dev);
+@@ -1554,7 +1511,6 @@ EXPORT_SYMBOL_GPL(usb_add_gadget_udc);
+ void usb_del_gadget(struct usb_gadget *gadget)
+ {
+ 	struct usb_udc *udc = gadget->udc;
+-	unsigned long flags;
+ 
+ 	if (!udc)
+ 		return;
+@@ -1568,13 +1524,6 @@ void usb_del_gadget(struct usb_gadget *gadget)
+ 	kobject_uevent(&udc->dev.kobj, KOBJ_REMOVE);
+ 	sysfs_remove_link(&udc->dev.kobj, "gadget");
+ 	device_del(&gadget->dev);
+-	/*
+-	 * Set the teardown flag before flushing the work to prevent new work
+-	 * from being scheduled while we are cleaning up.
+-	 */
+-	spin_lock_irqsave(&android_udc_state_lock, flags);
+-	udc->teardown = true;
+-	spin_unlock_irqrestore(&android_udc_state_lock, flags);
+ 	flush_work(&gadget->work);
+ 	ida_free(&gadget_id_numbers, gadget->id_number);
+ 	cancel_work_sync(&udc->vbus_work);
+diff --git a/aosp/include/linux/wrapfd.h b/aosp/include/linux/wrapfd.h
+deleted file mode 100644
+index 3514836d26ee..000000000000
+--- a/aosp/include/linux/wrapfd.h
++++ /dev/null
+@@ -1,79 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * WrapFD kernel API
+- *
+- * Copyright (C) 2025 Google, Inc.
+- */
+-
+-#ifndef _LINUX_WRAPFD_H
+-#define _LINUX_WRAPFD_H
+-
+-union wrapfd_mappable {
+-	struct dma_buf *dmabuf;
+-};
+-
+-#ifdef CONFIG_ANDROID_WRAPFD
+-
+-/* Check if the vma is mapping a wrapfd file. */
+-bool is_wrapfd_vma(struct vm_area_struct *vma);
+-
+-/*
+- * Get mappable object. Caller also gets buffer ownership.
+- * Function does not take file references, therefore the caller should
+- * ensure the file is stable until wrapfd_put_mappable() is called.
+- *
+- * file: wrap file to get the mappable object.
+- * dev: device requesting the operation.
+- * mappable: mappable object.
+- *
+- * On success returns mappable object. On error returns:
+- * -EBADF: file is invalid.
+- * -ENODEV: device is invalid.
+- * -EINVAL: buffer is mapped.
+- * -EBUSY: buffer is owned by another device.
+- * -ENOENT: wrap is empty (buffer got freed or moved)
+- */
+-int wrapfd_get_mappable(struct file *file, struct device *dev,
+-			union wrapfd_mappable *mappable);
+-
+-/*
+- * Release mappable object and buffer ownership. Caller should own the buffer.
+- * Note that the caller might still keep the buffer mapped. If the buffer
+- * is reused or freed then the next wrapfd_get_mappable() call will fail with
+- * -ENOENT and the mapping should be invalidated. If wrapfd_get_mappable()
+- * succeeds then previous mappings are still valid and can be reused.
+- *
+- * file: wrap file associated with the mappable object.
+- * dev: device requesting the operation.
+- * mappable: mappable object returned by wrapfd_get_mappable().
+- *
+- * On success returns 0. On error returns:
+- * -EBADF: file is invalid.
+- * -ENODEV: device is invalid.
+- * -EBUSY: buffer is not owned by the caller.
+- */
+-int wrapfd_put_mappable(struct file *file, struct device *dev,
+-			union wrapfd_mappable *mappable);
+-
+-#else /* CONFIG_ANDROID_WRAPFD */
+-
+-static inline bool is_wrapfd_vma(struct vm_area_struct *vma)
+-{
+-	return false;
+-}
+-
+-static inline int wrapfd_get_mappable(struct file *file, struct device *dev,
+-				      union wrapfd_mappable *mappable)
+-{
+-	return -ENOENT;
+-}
+-
+-static inline int wrapfd_put_mappable(struct file *file, struct device *dev,
+-				      union wrapfd_mappable *mappable)
+-{
+-	return -ENOENT;
+-}
+-
+-#endif /* CONFIG_ANDROID_WRAPFD */
+-
+-#endif /* _LINUX_WRAPFD_H */
+diff --git a/aosp/include/uapi/linux/wrapfd.h b/aosp/include/uapi/linux/wrapfd.h
+deleted file mode 100644
+index 7089963696e9..000000000000
+--- a/aosp/include/uapi/linux/wrapfd.h
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-/*
+- * Wrapfd UAPI
+- *
+- * Copyright (C) 2025 Google, Inc.
+- */
+-
+-#ifndef _UAPI_WRAPFD_H
+-#define _UAPI_WRAPFD_H
+-
+-#include <linux/types.h>
+-
+-struct wrapfd_wrap {
+-	__u32 fd;		/* [in] file to wrap */
+-	__u32 prot;		/* [in] protection bits */
+-	__u64 reserved;
+-};
+-
+-#define WRAPFD_CONTENT_EMPTY	0
+-#define WRAPFD_CONTENT_RDONLY	1
+-#define WRAPFD_CONTENT_RDWR	2
+-
+-struct wrapfd_get_state {
+-	__u32 state;		/* [out] wrapfd content state */
+-	__u32 pad;
+-	__u64 reserved;
+-};
+-
+-struct wrapfd_load {
+-	__u32 fd;		/* [in] file to load */
+-	__u32 pad;
+-	__u64 file_offs;	/* [in] file offset */
+-	__u64 buf_offs;		/* [in] buffer offset */
+-	__u64 len;		/* [in] number of bytes to load */
+-	__u64 reserved;
+-};
+-
+-struct wrapfd_rewrap {
+-	__u32 prot;		/* [in] protection bits */
+-	__u32 pad;
+-	__u64 reserved;
+-};
+-
+-/* ioctls for /dev/wrapfd */
+-#define WRAPFD_DEV_IOC 0xBC
+-#define WRAPFD_DEV_IOC_WRAP	_IOW(WRAPFD_DEV_IOC, 0, struct wrapfd_wrap)
+-
+-/* ioctl for wrapfd */
+-#define WRAPFD_DEV_IOC_GET_STATE	_IOWR(WRAPFD_DEV_IOC, 1, \
+-					      struct wrapfd_get_state)
+-#define WRAPFD_DEV_IOC_ACQUIRE_OWNERSHIP	_IO(WRAPFD_DEV_IOC, 2)
+-#define WRAPFD_DEV_IOC_RELEASE_OWNERSHIP	_IO(WRAPFD_DEV_IOC, 3)
+-#define WRAPFD_DEV_IOC_LOAD	_IOW(WRAPFD_DEV_IOC, 4, struct wrapfd_load)
+-#define WRAPFD_DEV_IOC_REWRAP	_IOW(WRAPFD_DEV_IOC, 5, struct wrapfd_rewrap)
+-#define WRAPFD_DEV_IOC_EMPTY	_IO(WRAPFD_DEV_IOC, 6)
+-#define WRAPFD_DEV_IOC_ALLOW_GUESTS	_IO(WRAPFD_DEV_IOC, 7)
+-#define WRAPFD_DEV_IOC_PROHIBIT_GUESTS	_IO(WRAPFD_DEV_IOC, 8)
+-
+-#endif /* _UAPI_WRAPFD_H */
+diff --git a/aosp/kernel/trace/trace_events_hist.c b/aosp/kernel/trace/trace_events_hist.c
+index e25d651d8fe7..336fc54d8ec8 100644
+--- a/aosp/kernel/trace/trace_events_hist.c
++++ b/aosp/aosp/kernel/trace/trace_events_hist.c
+@@ -2084,8 +2084,7 @@ static int init_var_ref(struct hist_field *ref_field,
+ 	ref_field->size = var_field->size;
+ 	ref_field->is_signed = var_field->is_signed;
+ 	ref_field->flags |= var_field->flags &
+-		(HIST_FIELD_FL_TIMESTAMP | HIST_FIELD_FL_TIMESTAMP_USECS |
+-		 HIST_FIELD_FL_STACKTRACE);
++		(HIST_FIELD_FL_TIMESTAMP | HIST_FIELD_FL_TIMESTAMP_USECS);
+ 
+ 	if (system) {
+ 		ref_field->system = kstrdup(system, GFP_KERNEL);
+@@ -3225,7 +3224,6 @@ static struct field_var *create_field_var(struct hist_trigger_data *hist_data,
+ 		ret =  -ENOMEM;
+ 		goto err;
+ 	}
+-	var->flags |= val->flags & HIST_FIELD_FL_STACKTRACE;
+ 
+ 	field_var->var = var;
+ 	field_var->val = val;
+@@ -3843,10 +3841,7 @@ static int check_synth_field(struct synth_event *event,
+ 	    && field->is_dynamic)
+ 		return 0;
+ 
+-	if (!!(hist_field->flags & HIST_FIELD_FL_STACKTRACE) != field->is_stack)
+-		return -EINVAL;
+-
+-	if (field->is_stack)
++	if (strstr(hist_field->type, "long[") && field->is_stack)
+ 		return 0;
+ 
+ 	if (strcmp(field->type, hist_field->type) != 0) {
+@@ -6268,6 +6263,12 @@ static int hist_register_trigger(char *glob,
+ 		data->ops = &event_hist_trigger_named_ops;
+ 	}
+ 
++	if (data->ops->init) {
++		ret = data->ops->init(data);
++		if (ret < 0)
++			goto out;
++	}
++
+ 	if (hist_data->enable_timestamps) {
+ 		char *clock = hist_data->attrs->clock;
+ 
+@@ -6280,15 +6281,6 @@ static int hist_register_trigger(char *glob,
+ 		tracing_set_filter_buffering(file->tr, true);
+ 	}
+ 
+-	if (data->ops->init) {
+-		ret = data->ops->init(data);
+-		if (ret < 0) {
+-			if (hist_data->enable_timestamps)
+-				tracing_set_filter_buffering(file->tr, false);
+-			goto out;
+-		}
+-	}
+-
+ 	if (named_data)
+ 		destroy_hist_data(hist_data);
+  out:
+@@ -6418,6 +6410,7 @@ static void hist_unreg_all(struct trace_event_file *file)
+ 	struct event_trigger_data *test, *n;
+ 	struct hist_trigger_data *hist_data;
+ 	struct synth_event *se;
++	const char *se_name;
+ 
+ 	lockdep_assert_held(&event_mutex);
+ 
+@@ -6430,7 +6423,8 @@ static void hist_unreg_all(struct trace_event_file *file)
+ 			list_del_rcu(&test->list);
+ 			trace_event_trigger_enable_disable(file, 0);
+ 
+-			se = find_synth_event_call(file->event_call);
++			se_name = trace_event_name(file->event_call);
++			se = find_synth_event(se_name);
+ 			if (se)
+ 				se->ref--;
+ 
+@@ -6454,6 +6448,7 @@ static int event_hist_trigger_parse(struct event_command *cmd_ops,
+ 	struct hist_trigger_data *hist_data;
+ 	char *param, *filter, *p, *start;
+ 	struct synth_event *se;
++	const char *se_name;
+ 	bool remove;
+ 	int ret = 0;
+ 
+@@ -6547,7 +6542,8 @@ static int event_hist_trigger_parse(struct event_command *cmd_ops,
+ 		}
+ 
+ 		event_trigger_unregister(cmd_ops, file, glob+1, trigger_data);
+-		se = find_synth_event_call(file->event_call);
++		se_name = trace_event_name(file->event_call);
++		se = find_synth_event(se_name);
+ 		if (se)
+ 			se->ref--;
+ 		ret = 0;
+@@ -6582,7 +6578,8 @@ static int event_hist_trigger_parse(struct event_command *cmd_ops,
+ 	if (ret)
+ 		goto out_unreg;
+ 
+-	se = find_synth_event_call(file->event_call);
++	se_name = trace_event_name(file->event_call);
++	se = find_synth_event(se_name);
+ 	if (se)
+ 		se->ref++;
+  out:
+diff --git a/aosp/kernel/trace/trace_events_synth.c b/aosp/kernel/trace/trace_events_synth.c
+index b3b236389cd5..c2817d0c05b6 100644
+--- a/aosp/kernel/trace/trace_events_synth.c
++++ b/aosp/aosp/kernel/trace/trace_events_synth.c
+@@ -867,16 +867,6 @@ struct synth_event *find_synth_event(const char *name)
+ 	return NULL;
+ }
+ 
+-struct synth_event *find_synth_event_call(struct trace_event_call *call)
+-{
+-	struct synth_event *se;
+-	const char *name;
+-
+-	name = trace_event_name(call);
+-	se = find_synth_event(name);
+-	return se && &se->call == call ? se : NULL;
+-}
+-
+ static struct trace_event_fields synth_event_fields_array[] = {
+ 	{ .type = TRACE_FUNCTION_TYPE,
+ 	  .define_fields = synth_event_define_fields },
+diff --git a/aosp/kernel/trace/trace_synth.h b/aosp/kernel/trace/trace_synth.h
+index d4ebf01b7049..43f6fb6078db 100644
+--- a/aosp/kernel/trace/trace_synth.h
++++ b/aosp/aosp/kernel/trace/trace_synth.h
+@@ -37,6 +37,5 @@ struct synth_event {
+ };
+ 
+ extern struct synth_event *find_synth_event(const char *name);
+-extern struct synth_event *find_synth_event_call(struct trace_event_call *call);
+ 
+ #endif /* __TRACE_SYNTH_H */
+diff --git a/aosp/mm/memcontrol.c b/aosp/mm/memcontrol.c
+index 58944d6538b1..f9ac8d9c52a4 100644
+--- a/aosp/mm/memcontrol.c
++++ b/aosp/aosp/mm/memcontrol.c
+@@ -2433,10 +2433,7 @@ static void high_work_func(struct work_struct *work)
+ 	struct mem_cgroup *memcg;
+ 
+ 	memcg = container_of(work, struct mem_cgroup, high_work);
+-	if (!css_tryget_online(&memcg->css))
+-		return;
+ 	reclaim_high(memcg, MEMCG_CHARGE_BATCH, GFP_KERNEL);
+-	css_put(&memcg->css);
+ }
+ 
+ /*
+@@ -5488,8 +5485,6 @@ static void mem_cgroup_css_offline(struct cgroup_subsys_state *css)
+ 
+ 	page_counter_set_min(&memcg->memory, 0);
+ 	page_counter_set_low(&memcg->memory, 0);
+-	page_counter_set_high(&memcg->memory, PAGE_COUNTER_MAX);
+-	page_counter_set_high(&memcg->swap, PAGE_COUNTER_MAX);
+ 
+ 	memcg_offline_kmem(memcg);
+ 	reparent_shrinker_deferred(memcg);
+diff --git a/aosp/mm/mmap.c b/aosp/mm/mmap.c
+index c7bff974ec03..c9deb6ad0ba4 100644
+--- a/aosp/mm/mmap.c
++++ b/aosp/aosp/mm/mmap.c
+@@ -49,7 +49,6 @@
+ #include <linux/sched/mm.h>
+ #include <linux/memfd.h>
+ #include <linux/dma-buf.h>
+-#include <linux/wrapfd.h>
+ 
+ #include <linux/uaccess.h>
+ #include <asm/cacheflush.h>
+@@ -3146,14 +3145,6 @@ SYSCALL_DEFINE5(remap_file_pages, unsigned long, start, unsigned long, size,
+ 			goto out;
+ 	}
+ 
+-	/*
+-	 * Remapping pages of the wrapfd is not supported since vma->vm_file
+-	 * points to the file object representing the wrapped content and not
+-	 * the wrapfd.
+-	 */
+-	if (unlikely(is_wrapfd_vma(vma)))
+-		goto out;
+-
+ 	prot |= vma->vm_flags & VM_READ ? PROT_READ : 0;
+ 	prot |= vma->vm_flags & VM_WRITE ? PROT_WRITE : 0;
+ 	prot |= vma->vm_flags & VM_EXEC ? PROT_EXEC : 0;
+diff --git a/aosp/mm/shmem.c b/aosp/mm/shmem.c
+index c646a2dbf177..762354fb17e4 100644
+--- a/aosp/mm/shmem.c
++++ b/aosp/aosp/mm/shmem.c
+@@ -2321,12 +2321,6 @@ static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
+ 	return 0;
+ }
+ 
+-static int shmem_file_open(struct inode *inode, struct file *file)
+-{
+-	file->f_mode |= FMODE_CAN_ODIRECT;
+-	return generic_file_open(inode, file);
+-}
+-
+ #ifdef CONFIG_TMPFS_XATTR
+ static int shmem_initxattrs(struct inode *, const struct xattr *, void *);
+ 
+@@ -2741,28 +2735,6 @@ static ssize_t shmem_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	return retval ? retval : error;
+ }
+ 
+-static ssize_t shmem_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
+-{
+-	struct file *file = iocb->ki_filp;
+-	struct inode *inode = file->f_mapping->host;
+-	ssize_t ret;
+-
+-	inode_lock(inode);
+-	ret = generic_write_checks(iocb, from);
+-	if (ret <= 0)
+-		goto unlock;
+-	ret = file_remove_privs(file);
+-	if (ret)
+-		goto unlock;
+-	ret = file_update_time(file);
+-	if (ret)
+-		goto unlock;
+-	ret = generic_perform_write(iocb, from);
+-unlock:
+-	inode_unlock(inode);
+-	return ret;
+-}
+-
+ static loff_t shmem_file_llseek(struct file *file, loff_t offset, int whence)
+ {
+ 	struct address_space *mapping = file->f_mapping;
+@@ -3994,12 +3966,11 @@ EXPORT_SYMBOL(shmem_aops);
+ 
+ static const struct file_operations shmem_file_operations = {
+ 	.mmap		= shmem_mmap,
+-	.open		= shmem_file_open,
+ 	.get_unmapped_area = shmem_get_unmapped_area,
+ #ifdef CONFIG_TMPFS
+ 	.llseek		= shmem_file_llseek,
+ 	.read_iter	= shmem_file_read_iter,
+-	.write_iter	= shmem_file_write_iter,
++	.write_iter	= generic_file_write_iter,
+ 	.fsync		= noop_fsync,
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
+diff --git a/aosp/mm/slub.c b/aosp/mm/slub.c
+index 600a7abe3736..b83357560f30 100644
+--- a/aosp/mm/slub.c
++++ b/aosp/aosp/mm/slub.c
+@@ -3894,26 +3894,12 @@ void kmem_cache_free_bulk(struct kmem_cache *s, size_t size, void **p)
+ }
+ EXPORT_SYMBOL(kmem_cache_free_bulk);
+ 
+-/* Free checks for the active canary, so the error path needs this too. */
+-static inline void activate_canaries_bulk(struct kmem_cache *s, int size,
+-					  void **p)
+-{
+-	int k;
+-
+-	for (k = 0; k < size; k++) {
+-		if (!is_kfence_address(p[k])) {
+-			check_canary(s, p[k], s->random_inactive);
+-			set_canary(s, p[k], s->random_active);
+-		}
+-	}
+-}
+-
+ /* Note that interrupts must be enabled when calling this function. */
+ int kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t size,
+ 			  void **p)
+ {
+ 	struct kmem_cache_cpu *c;
+-	int i;
++	int i, k;
+ 	struct obj_cgroup *objcg = NULL;
+ 
+ 	/* memcg and kmem_cache debug support */
+@@ -3973,7 +3959,12 @@ int kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t size,
+ 	local_unlock_irq(&s->cpu_slab->lock);
+ 	slub_put_cpu_ptr(s->cpu_slab);
+ 
+-	activate_canaries_bulk(s, i, p);
++	for (k = 0; k < i; k++) {
++		if (!is_kfence_address(p[k])) {
++			check_canary(s, p[k], s->random_inactive);
++			set_canary(s, p[k], s->random_active);
++		}
++	}
+ 
+ 	/*
+ 	 * memcg and kmem_cache debug support and memory initialization.
+@@ -3984,7 +3975,6 @@ int kmem_cache_alloc_bulk(struct kmem_cache *s, gfp_t flags, size_t size,
+ 	return i;
+ error:
+ 	slub_put_cpu_ptr(s->cpu_slab);
+-	activate_canaries_bulk(s, i, p);
+ 	slab_post_alloc_hook(s, objcg, flags, i, p, false);
+ 	kmem_cache_free_bulk(s, i, p);
+ 	return 0;
+diff --git a/aosp/sound/usb/endpoint.c b/aosp/sound/usb/endpoint.c
+index dbf2ed216592..cf6e9ec104c7 100644
+--- a/aosp/sound/usb/endpoint.c
++++ b/aosp/aosp/sound/usb/endpoint.c
+@@ -517,18 +517,13 @@ int snd_usb_queue_pending_output_urbs(struct snd_usb_endpoint *ep,
+ 			return -EPIPE;
+ 		}
+ 
+-		if (!atomic_read(&ep->chip->shutdown))
+-			err = usb_submit_urb(ctx->urb, GFP_ATOMIC);
+-		else
+-			err = -ENODEV;
++		err = usb_submit_urb(ctx->urb, GFP_ATOMIC);
+ 		if (err < 0) {
+-			if (!atomic_read(&ep->chip->shutdown)) {
+-				usb_audio_err(ep->chip,
+-					      "Unable to submit urb #%d: %d at %s\n",
+-					      ctx->index, err, __func__);
+-				if (!in_stream_lock)
+-					notify_xrun(ep);
+-			}
++			usb_audio_err(ep->chip,
++				      "Unable to submit urb #%d: %d at %s\n",
++				      ctx->index, err, __func__);
++			if (!in_stream_lock)
++				notify_xrun(ep);
+ 			return -EPIPE;
+ 		}
+ 
+@@ -595,17 +590,12 @@ static void snd_complete_urb(struct urb *urb)
+ 		prepare_inbound_urb(ep, ctx);
+ 	}
+ 
+-	if (!atomic_read(&ep->chip->shutdown))
+-		err = usb_submit_urb(urb, GFP_ATOMIC);
+-	else
+-		err = -ENODEV;
++	err = usb_submit_urb(urb, GFP_ATOMIC);
+ 	if (err == 0)
+ 		return;
+ 
+-	if (!atomic_read(&ep->chip->shutdown)) {
+-		usb_audio_err(ep->chip, "cannot submit urb (err = %d)\n", err);
+-		notify_xrun(ep);
+-	}
++	usb_audio_err(ep->chip, "cannot submit urb (err = %d)\n", err);
++	notify_xrun(ep);
+ 
+ exit_clear:
+ 	clear_bit(ctx->index, &ep->active_mask);
+@@ -1656,15 +1646,11 @@ int snd_usb_endpoint_start(struct snd_usb_endpoint *ep)
+ 			goto __error;
+ 		}
+ 
+-		if (!atomic_read(&ep->chip->shutdown))
+-			err = usb_submit_urb(urb, GFP_ATOMIC);
+-		else
+-			err = -ENODEV;
++		err = usb_submit_urb(urb, GFP_ATOMIC);
+ 		if (err < 0) {
+-			if (!atomic_read(&ep->chip->shutdown))
+-				usb_audio_err(ep->chip,
+-					      "cannot submit urb %d, error %d: %s\n",
+-					      i, err, usb_error_string(err));
++			usb_audio_err(ep->chip,
++				"cannot submit urb %d, error %d: %s\n",
++				i, err, usb_error_string(err));
+ 			goto __error;
+ 		}
+ 		set_bit(i, &ep->active_mask);
+diff --git a/aosp/tools/testing/selftests/Makefile b/aosp/tools/testing/selftests/Makefile
+index f51ff0ac2e30..bf34fa443b23 100644
+--- a/aosp/tools/testing/selftests/Makefile
++++ b/aosp/aosp/tools/testing/selftests/Makefile
+@@ -15,7 +15,6 @@ TARGETS += drivers/dma-buf
+ TARGETS += drivers/s390x/uvdevice
+ TARGETS += drivers/net/bonding
+ TARGETS += drivers/net/team
+-TARGETS += drivers/wrapfd
+ TARGETS += efivarfs
+ TARGETS += exec
+ TARGETS += filesystems
+diff --git a/aosp/tools/testing/selftests/drivers/wrapfd/.gitignore b/aosp/tools/testing/selftests/drivers/wrapfd/.gitignore
+deleted file mode 100644
+index a8ba46c8e53f..000000000000
+--- a/aosp/tools/testing/selftests/drivers/wrapfd/.gitignore
++++ /dev/null
+@@ -1 +0,0 @@
+-wrapfd
+diff --git a/aosp/tools/testing/selftests/drivers/wrapfd/Makefile b/aosp/tools/testing/selftests/drivers/wrapfd/Makefile
+deleted file mode 100644
+index 338017793138..000000000000
+--- a/aosp/tools/testing/selftests/drivers/wrapfd/Makefile
++++ /dev/null
+@@ -1,9 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0-only
+-CFLAGS += $(KHDR_INCLUDES) -I../../../../include
+-LDFLAGS += -static
+-
+-TEST_GEN_PROGS := wrapfd
+-
+-top_srcdir ?=../../../../..
+-
+-include ../../lib.mk
+diff --git a/aosp/tools/testing/selftests/drivers/wrapfd/config b/aosp/tools/testing/selftests/drivers/wrapfd/config
+deleted file mode 100644
+index 4dea8a31d73f..000000000000
+--- a/aosp/tools/testing/selftests/drivers/wrapfd/config
++++ /dev/null
+@@ -1 +0,0 @@
+-CONFIG_ANDROID_WRAPFD=y
+diff --git a/aosp/tools/testing/selftests/drivers/wrapfd/wrapfd.c b/aosp/tools/testing/selftests/drivers/wrapfd/wrapfd.c
+deleted file mode 100644
+index 62c26e9cd6a2..000000000000
+--- a/aosp/tools/testing/selftests/drivers/wrapfd/wrapfd.c
++++ /dev/null
+@@ -1,1116 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Copyright 2025 Google LLC.
+- * Author: Suren Baghdasaryan <surenb@google.com>
+- *
+- * Permission to use, copy, modify, and distribute this software for any
+- * purpose with or without fee is hereby granted, provided that the above
+- * copyright notice and this permission notice appear in all copies.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+- */
+-/*
+- * WrapFD API tests
+- */
+-#define _GNU_SOURCE
+-#include <errno.h>
+-#include <fcntl.h>
+-#include <getopt.h>
+-#include <stdbool.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <time.h>
+-#include <unistd.h>
+-#include <sys/ioctl.h>
+-#include <sys/mman.h>
+-#include <sys/stat.h>
+-#include <sys/syscall.h>
+-#include <sys/types.h>
+-#include <sys/wait.h>
+-#include <linux/align.h>
+-#include <linux/dma-buf.h>
+-#include <linux/dma-heap.h>
+-#include <linux/wrapfd.h>
+-#include "../../kselftest_harness.h"
+-
+-#define offset_in_page(addr, page_size) ((addr) & (page_size - 1))
+-
+-/* ioctl wrappers */
+-static inline int wrapfd_wrap(int dev_fd, int fd, int prot)
+-{
+-	struct wrapfd_wrap wrap = {
+-		.fd = fd,
+-		.prot = prot,
+-	};
+-
+-	return ioctl(dev_fd, WRAPFD_DEV_IOC_WRAP, &wrap);
+-}
+-
+-static inline int wrapfd_get_state(int wrapfd, unsigned int *state)
+-{
+-	struct wrapfd_get_state wrap_state = { 0 };
+-	int ret;
+-
+-	ret = ioctl(wrapfd, WRAPFD_DEV_IOC_GET_STATE, &wrap_state);
+-	if (!ret && state)
+-		*state = wrap_state.state;
+-
+-	return ret;
+-}
+-
+-static inline int wrapfd_acquire_ownership(int wrapfd)
+-{
+-	return ioctl(wrapfd, WRAPFD_DEV_IOC_ACQUIRE_OWNERSHIP, NULL);
+-}
+-
+-static inline int wrapfd_release_ownership(int wrapfd)
+-{
+-	return ioctl(wrapfd, WRAPFD_DEV_IOC_RELEASE_OWNERSHIP, NULL);
+-}
+-
+-static inline int wrapfd_load(int wrapfd, int fd, unsigned long file_offs,
+-			      unsigned long buf_offs, unsigned long len)
+-{
+-	struct wrapfd_load load = {
+-		.fd = fd,
+-		.file_offs = file_offs,
+-		.buf_offs = buf_offs,
+-		.len = len,
+-	};
+-
+-	return ioctl(wrapfd, WRAPFD_DEV_IOC_LOAD, &load);
+-}
+-
+-static inline int wrapfd_rewrap(int wrapfd, int prot)
+-{
+-	struct wrapfd_rewrap rewrap = {
+-		.prot = prot,
+-	};
+-
+-	return ioctl(wrapfd, WRAPFD_DEV_IOC_REWRAP, &rewrap);
+-}
+-
+-static inline int wrapfd_empty(int wrapfd)
+-{
+-	return ioctl(wrapfd, WRAPFD_DEV_IOC_EMPTY, NULL);
+-}
+-
+-static inline int wrapfd_allow_guests(int wrapfd)
+-{
+-	return ioctl(wrapfd, WRAPFD_DEV_IOC_ALLOW_GUESTS, NULL);
+-}
+-
+-static inline int wrapfd_prohibit_guests(int wrapfd)
+-{
+-	return ioctl(wrapfd, WRAPFD_DEV_IOC_PROHIBIT_GUESTS, NULL);
+-}
+-
+-/* test utility functions */
+-static int dmabuf_heap_alloc(int heap_fd, size_t len, int fd_flags)
+-{
+-	struct dma_heap_allocation_data data = {
+-		.len = len,
+-		.fd = 0,
+-		.fd_flags = fd_flags | O_CLOEXEC,
+-		.heap_flags = 0,
+-	};
+-	int ret = ioctl(heap_fd, DMA_HEAP_IOCTL_ALLOC, &data);
+-
+-	return ret < 0 ? ret : data.fd;
+-}
+-
+-static int dmabuf_sync(int dmabuf_fd, bool start, int access_type)
+-{
+-	struct dma_buf_sync sync = {
+-		.flags = (start ? DMA_BUF_SYNC_START : DMA_BUF_SYNC_END) | access_type,
+-	};
+-
+-	return ioctl(dmabuf_fd, DMA_BUF_IOCTL_SYNC, &sync);
+-}
+-
+-static int dmabuf_sync_start(int dmabuf_fd, int access_type)
+-{
+-	return dmabuf_sync(dmabuf_fd, true, access_type);
+-}
+-
+-static int dmabuf_sync_end(int dmabuf_fd, int access_type)
+-{
+-	return dmabuf_sync(dmabuf_fd, false, access_type);
+-}
+-
+-static void generate_file_content(char *content, size_t size)
+-{
+-	srand(time(NULL));
+-	/* Generate only printable characters in the range of [32, 126] */
+-	for (size_t i = 0; i < size; i++)
+-		content[i] = 32 + rand() % 95;
+-}
+-
+-FIXTURE(wrapfd_tests)
+-{
+-	size_t page_size;
+-	char *content;
+-	size_t size;
+-	int dev_fd;
+-	int fd;
+-};
+-
+-static size_t get_file_size(size_t page_size)
+-{
+-	size_t min_req_size = 100 * page_size - page_size / 2;
+-	FILE *min_req_size_fp;
+-
+-	min_req_size_fp = fopen("/sys/module/wrapfd/parameters/min_bytes_per_req", "r");
+-	if (!min_req_size_fp)
+-		return min_req_size;
+-
+-	if (fscanf(min_req_size_fp, "%zu\n", &min_req_size) != 1)
+-		goto out;
+-
+-	/*
+-	 * Intentionally make the file size large enough so that the driver divides loads into
+-	 * multiple requests, and make the file size page unaligned if necessary.
+-	 */
+-	min_req_size *= 3;
+-	if (IS_ALIGNED(min_req_size, page_size))
+-		min_req_size -= page_size / 2;
+-
+-out:
+-	fclose(min_req_size_fp);
+-	return min_req_size;
+-}
+-
+-FIXTURE_SETUP(wrapfd_tests)
+-{
+-	ssize_t total_wr;
+-	FILE *ftmp;
+-
+-	EXPECT_EQ(getuid(), 0)
+-		SKIP(return, "Skipping all tests as non-root");
+-
+-	EXPECT_EQ(access("/dev/wrapfd", F_OK), 0)
+-		SKIP(return, "Skipping all tests; kernel lacks wrapfd support");
+-
+-	self->page_size = (size_t)sysconf(_SC_PAGESIZE);
+-	self->size = get_file_size(self->page_size);
+-
+-	self->dev_fd = open("/dev/wrapfd", O_RDONLY);
+-	ASSERT_TRUE(self->dev_fd >= 0);
+-
+-	/* Prepare random content buffer */
+-	self->content = malloc(self->size);
+-	generate_file_content(self->content, self->size);
+-
+-	/* Prepare temporary file with the same content */
+-	ftmp = tmpfile();
+-	ASSERT_NE(ftmp, NULL);
+-	self->fd = dup(fileno(ftmp));
+-	fclose(ftmp);
+-
+-	total_wr = 0;
+-	do {
+-		ssize_t wr = write(self->fd, self->content + total_wr,
+-				   self->size - total_wr);
+-		ASSERT_TRUE(wr >= 0);
+-		total_wr += wr;
+-	} while (total_wr < self->size);
+-}
+-
+-FIXTURE_TEARDOWN(wrapfd_tests)
+-{
+-	close(self->fd);
+-	free(self->content);
+-	close(self->dev_fd);
+-}
+-
+-static int cmp_content(struct __test_metadata *_metadata,
+-		       FIXTURE_DATA(wrapfd_tests) *self, int wrapfd, unsigned long file_offs,
+-		       unsigned long buf_offs, unsigned long len)
+-{
+-	/* mmap() operates on page aligned offsets and lengths, so handle that here. */
+-	unsigned long aligned_buf_offs = ALIGN_DOWN(buf_offs, self->page_size);
+-	unsigned long buf_pg_offs = offset_in_page(buf_offs, self->page_size);
+-	unsigned long aligned_len = ALIGN(buf_offs + len, self->page_size) - aligned_buf_offs;
+-	char *ptr;
+-	int ret;
+-
+-	ptr = mmap(NULL, aligned_len, PROT_READ, MAP_SHARED, wrapfd, aligned_buf_offs);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_EQ(dmabuf_sync_start(wrapfd, DMA_BUF_SYNC_READ), 0);
+-	ret = memcmp(self->content + file_offs, ptr + buf_pg_offs, len);
+-	ASSERT_EQ(dmabuf_sync_end(wrapfd, DMA_BUF_SYNC_READ), 0);
+-	ASSERT_EQ(munmap(ptr, aligned_len), 0);
+-
+-	return ret;
+-}
+-
+-static void clear_content(struct __test_metadata *_metadata,
+-			  FIXTURE_DATA(wrapfd_tests) *self, int wrapfd)
+-{
+-	char *ptr;
+-
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_EQ(dmabuf_sync_start(wrapfd, DMA_BUF_SYNC_WRITE), 0);
+-	memset(ptr, 0, self->size);
+-	ASSERT_EQ(dmabuf_sync_end(wrapfd, DMA_BUF_SYNC_WRITE), 0);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-}
+-
+-static void test_wrap(struct __test_metadata *_metadata,
+-		      FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	struct stat sb;
+-
+-	/* Get state of a non-wrapped fd */
+-	ASSERT_TRUE(wrapfd_get_state(fd, NULL) &&
+-		    errno == ENOTTY);
+-	ASSERT_TRUE(wrapfd_get_state(self->dev_fd, NULL) &&
+-		    errno == ENOTTY);
+-
+-	/* Wrap and get state of a wrapped fd */
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-	ASSERT_EQ(wrapfd_get_state(wrapfd, NULL), 0);
+-
+-	/* Ensure that the size of the wrapfd matches the size of the underlying buffer. */
+-	ASSERT_EQ(fstat(wrapfd, &sb), 0);
+-	ASSERT_EQ(sb.st_size, ALIGN(self->size, self->page_size));
+-
+-	close(wrapfd);
+-}
+-
+-static void test_wrap_rdonly_file(struct __test_metadata *_metadata,
+-				  FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	unsigned int state;
+-
+-	/* Wrapping a read-only file in a read/write wrap should fail. */
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_NE(wrapfd, 0);
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-	ASSERT_EQ(wrapfd_get_state(wrapfd, &state), 0);
+-	ASSERT_EQ(state, WRAPFD_CONTENT_RDONLY);
+-
+-	close(wrapfd);
+-}
+-
+-static const void *memchr_inv(const void *start, int c, size_t bytes)
+-{
+-	const char *src = start;
+-	char val = c;
+-	int i;
+-
+-	for (i = 0; i < bytes; i++)
+-		if (src[i] != val)
+-			return &src[i];
+-
+-	return NULL;
+-}
+-
+-static int poison_region(int wrapfd, void *start, int poison, size_t bytes)
+-{
+-	int ret = dmabuf_sync_start(wrapfd, DMA_BUF_SYNC_WRITE);
+-
+-	if (ret)
+-		return ret;
+-
+-	memset(start, poison, bytes);
+-
+-	return dmabuf_sync_end(wrapfd, DMA_BUF_SYNC_WRITE);
+-}
+-
+-static int verify_region_poison(int wrapfd, void *start, int poison, size_t bytes)
+-{
+-	int ret = dmabuf_sync_start(wrapfd, DMA_BUF_SYNC_READ);
+-	bool poisoned;
+-
+-	if (ret)
+-		return ret;
+-
+-	poisoned = memchr_inv(start, poison, bytes) == NULL;
+-
+-	ret = dmabuf_sync_end(wrapfd, DMA_BUF_SYNC_READ);
+-	if (ret)
+-		return ret;
+-
+-	return poisoned ? 0 : -1;
+-}
+-
+-static int load_and_cmp(struct __test_metadata *_metadata, FIXTURE_DATA(wrapfd_tests) *self,
+-			int wrapfd, unsigned long file_offs, unsigned long buf_offs,
+-			unsigned long len)
+-{
+-	const char poison = 0xaa;
+-	int ret;
+-	char *head_ptr = NULL;
+-	unsigned long tail_len, tail_aligned_offset, tail_map_len;
+-	char *tail_page_ptr = NULL;
+-	char *tail_ptr = NULL;
+-
+-	clear_content(_metadata, self, wrapfd);
+-
+-	ret = cmp_content(_metadata, self, wrapfd, 0, 0, self->size);
+-	EXPECT_NE(ret, 0)
+-		return ret;
+-
+-	if (buf_offs) {
+-		head_ptr = mmap(NULL, buf_offs, PROT_READ | PROT_WRITE, MAP_SHARED, wrapfd, 0);
+-		EXPECT_NE(head_ptr, MAP_FAILED)
+-			return -1;
+-
+-		ret = poison_region(wrapfd, head_ptr, poison, buf_offs);
+-		EXPECT_EQ(ret, 0)
+-			goto out_unmap_head;
+-	}
+-
+-	if ((buf_offs + len) < self->size) {
+-		tail_len = self->size - buf_offs - len;
+-		tail_aligned_offset = ALIGN_DOWN(buf_offs + len, self->page_size);
+-		tail_map_len = self->size - tail_aligned_offset;
+-		tail_page_ptr = mmap(NULL, tail_map_len, PROT_READ | PROT_WRITE, MAP_SHARED, wrapfd,
+-				     tail_aligned_offset);
+-		EXPECT_NE(tail_page_ptr, MAP_FAILED) {
+-			ret = -1;
+-			goto out_unmap_head;
+-		}
+-
+-		tail_ptr = tail_page_ptr + offset_in_page(buf_offs + len, self->page_size);
+-		ret = poison_region(wrapfd, tail_ptr, poison, tail_len);
+-		EXPECT_EQ(ret, 0)
+-			goto out_unmap_tail;
+-	}
+-
+-	ret = wrapfd_load(wrapfd, self->fd, file_offs, buf_offs, len);
+-	EXPECT_EQ(ret, 0)
+-		goto out_unmap_tail;
+-
+-	if (head_ptr) {
+-		ret = verify_region_poison(wrapfd, head_ptr, poison, buf_offs);
+-		EXPECT_EQ(ret, 0)
+-			goto out_unmap_tail;
+-	}
+-
+-	ret = cmp_content(_metadata, self, wrapfd, file_offs, buf_offs, len);
+-	EXPECT_EQ(ret, 0)
+-		goto out_unmap_tail;
+-
+-	if (tail_ptr) {
+-		ret = verify_region_poison(wrapfd, tail_ptr, poison, tail_len);
+-		EXPECT_EQ(ret, 0);
+-	}
+-
+-out_unmap_tail:
+-	if (tail_page_ptr)
+-		EXPECT_EQ(munmap(tail_page_ptr, tail_map_len), 0);
+-out_unmap_head:
+-	if (head_ptr)
+-		EXPECT_EQ(munmap(head_ptr, buf_offs), 0);
+-	return ret;
+-}
+-
+-static int __test_loads(struct __test_metadata *_metadata,
+-			FIXTURE_DATA(wrapfd_tests) *self, int wrapfd)
+-{
+-	int ret;
+-
+-	/* Test a sub-page load and ensure only the requested part was written to. */
+-	ret = load_and_cmp(_metadata, self, wrapfd, 0, 0, self->page_size / 2);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	ret = load_and_cmp(_metadata, self, wrapfd, self->page_size / 2, 0, self->page_size / 2);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	/* Test tiny read at random offsets. */
+-	ret = load_and_cmp(_metadata, self, wrapfd, 100, 0, 50);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	/* Cross a page boundary in the file and then in the buffer. */
+-	ret = load_and_cmp(_metadata, self, wrapfd, self->page_size - 1, 0, self->page_size);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	ret = load_and_cmp(_metadata, self, wrapfd, 0, self->page_size - 1, self->page_size);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	/*
+-	 * Start bounce buffer, large O_DIRECT read and memmove() logic along with end bounce
+-	 * buffer.
+-	 */
+-	ret = load_and_cmp(_metadata, self, wrapfd, self->page_size / 2, self->page_size / 4,
+-			   self->page_size * 3);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	/* Test logic for fitting everything within the first bounce page. */
+-	ret = load_and_cmp(_metadata, self, wrapfd, self->page_size / 2, self->page_size / 2,
+-			   self->page_size / 2);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	ret = load_and_cmp(_metadata, self, wrapfd, self->page_size, self->page_size,
+-			   self->size - self->page_size);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	/*
+-	 * Test logic to use a bounce buffer at the start and end with a large enough request
+-	 * that gets split into multiple sub-requests.
+-	 */
+-	ret = load_and_cmp(_metadata, self, wrapfd, self->page_size / 2, self->page_size / 2,
+-			   self->size - (self->page_size / 2));
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	/*
+-	 * Test logic to use a bounce buffer at the start and end with 2 bounce buffers at the end.
+-	 *
+-	 * 2 bounce buffers get allocated because after accounting for the start buffer, the
+-	 * remaining length to be copied at the proper offset crosses a page boundary.
+-	 */
+-	ret = load_and_cmp(_metadata, self, wrapfd, self->page_size - 1, 0, self->page_size + 4);
+-	EXPECT_EQ(ret, 0)
+-		return ret;
+-
+-	/* Save this one for last since subsequent tests run comparisons on the entire buffer. */
+-	ret = load_and_cmp(_metadata, self, wrapfd, 0, 0, self->size);
+-	EXPECT_EQ(ret, 0);
+-
+-	return ret;
+-}
+-
+-static void test_load_mapped(struct __test_metadata *_metadata,
+-			     FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	/* Loading should still work while a buffer is mapped. */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED, wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-
+-	ASSERT_EQ(__test_loads(_metadata, self, wrapfd), 0);
+-
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-	close(wrapfd);
+-}
+-
+-static void test_load_unmapped(struct __test_metadata *_metadata,
+-			       FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	ASSERT_EQ(__test_loads(_metadata, self, wrapfd), 0);
+-
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-	close(wrapfd);
+-}
+-
+-static void test_load_rdonly_file(struct __test_metadata *_metadata,
+-				  FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	ASSERT_TRUE(wrapfd_load(wrapfd, self->fd, 0, 0, self->size) < 0 && errno == EACCES);
+-
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-	close(wrapfd);
+-}
+-
+-static void test_wrap_rdonly(struct __test_metadata *_metadata,
+-			     FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Check content of the buffer */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd, 0, 0, self->size), 0);
+-
+-	/* Try mapping as writable */
+-	ASSERT_EQ(mmap(NULL, self->size, PROT_READ | PROT_WRITE,
+-		       MAP_SHARED, wrapfd, 0), MAP_FAILED);
+-	ASSERT_EQ(errno, EACCES);
+-
+-	close(wrapfd);
+-}
+-
+-static void test_wrap_rdwr(struct __test_metadata *_metadata,
+-			   FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Check content of the buffer before modification */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd, 0, 0, self->size), 0);
+-
+-	/* Modify buffer content */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_EQ(dmabuf_sync_start(wrapfd, DMA_BUF_SYNC_RW), 0);
+-	ptr[0]++;
+-
+-	/* Check content of the buffer after modification */
+-	ASSERT_NE(cmp_content(_metadata, self, wrapfd, 0, 0, self->size), 0);
+-
+-	/* Restore buffer content */
+-	ptr[0]--;
+-	ASSERT_EQ(dmabuf_sync_end(wrapfd, DMA_BUF_SYNC_RW), 0);
+-
+-
+-	/* Confirm the final content */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd, 0, 0, self->size), 0);
+-
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	close(wrapfd);
+-}
+-
+-/* Bionic's implementation of libc does not have a wrapper for remap_file_pages(). */
+-#ifdef __ANDROID__
+-static int remap_file_pages(void *addr, size_t size, int prot, size_t pgoff, int flags)
+-{
+-	return syscall(__NR_remap_file_pages, addr, size, prot, pgoff, flags);
+-}
+-#endif
+-
+-static void test_remap_file_pages(struct __test_metadata *_metadata,
+-				  FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	char *ptr;
+-
+-	/* remap_file_pages() on the content should succeed */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   fd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_EQ(remap_file_pages(ptr, self->page_size, 0, 1, 0), 0);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	/* remap_file_pages() on the wrapfd should fail with EINVAL error */
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_EQ(remap_file_pages(ptr, self->page_size, 0, 1, 0), -1);
+-	ASSERT_EQ(errno, EINVAL);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	close(wrapfd);
+-}
+-
+-static void test_wrap_remap(struct __test_metadata *_metadata,
+-			    FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	char *ptr, *new_ptr;
+-	int wrapfd;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Check content of the buffer before modification */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd, 0, 0, self->size), 0);
+-
+-	/* Modify buffer content */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-
+-	/* Remap to a new address */
+-	new_ptr = mremap(ptr, self->size, self->size, MREMAP_MAYMOVE);
+-	ASSERT_NE(new_ptr, MAP_FAILED);
+-	ASSERT_EQ(memcmp(self->content, new_ptr, self->size), 0);
+-	ptr = new_ptr;
+-
+-	/* Resize the mapping */
+-	new_ptr = mremap(ptr, self->size, self->size / 2, MREMAP_MAYMOVE);
+-	ASSERT_NE(new_ptr, MAP_FAILED);
+-	ASSERT_EQ(memcmp(self->content, new_ptr, self->size / 2), 0);
+-	ptr = new_ptr;
+-	ASSERT_EQ(munmap(ptr, self->size / 2), 0);
+-
+-	close(wrapfd);
+-}
+-
+-static void test_wrap_fork(struct __test_metadata *_metadata,
+-			   FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd, status;
+-	char *ptr;
+-	pid_t pid;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Check content of the buffer before modification */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd, 0, 0, self->size), 0);
+-
+-	/* Modify buffer content */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-
+-	pid = fork();
+-	ASSERT_FALSE(pid < 0);
+-	if (pid == 0) {
+-		/* Check the content from the child */
+-		ASSERT_EQ(dmabuf_sync_start(wrapfd, DMA_BUF_SYNC_READ), 0);
+-		ASSERT_EQ(memcmp(self->content, ptr, self->size), 0);
+-		ASSERT_EQ(dmabuf_sync_end(wrapfd, DMA_BUF_SYNC_READ), 0);
+-		exit(EXIT_SUCCESS);
+-	} else {
+-		ASSERT_NE(wait(&status), -1);
+-		ASSERT_TRUE(WIFEXITED(status));
+-		ASSERT_EQ(WEXITSTATUS(status), 0);
+-	}
+-
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	close(wrapfd);
+-}
+-
+-static void test_dup(struct __test_metadata *_metadata,
+-		     FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd, wrapfd2;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	wrapfd2 = dup(wrapfd);
+-	ASSERT_TRUE(wrapfd2 >= 0);
+-
+-	/* Check content of the buffer using both fds */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd, 0, 0, self->size), 0);
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd2, 0, 0, self->size), 0);
+-
+-	close(wrapfd2);
+-	close(wrapfd);
+-}
+-
+-static void test_owner(struct __test_metadata *_metadata,
+-		       FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Try taking ownership of a mapped wrapfd */
+-	ptr = mmap(NULL, self->size, PROT_READ, MAP_SHARED | MAP_POPULATE,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_TRUE(wrapfd_acquire_ownership(wrapfd) && errno == EINVAL);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	/* Take ownership of an unmapped wrapfd */
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	/* Map owned wrapfd */
+-	ptr = mmap(NULL, self->size, PROT_READ, MAP_SHARED | MAP_POPULATE,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-
+-	/* Try releasing ownership while still mapped */
+-	ASSERT_TRUE(wrapfd_release_ownership(wrapfd) && errno == EINVAL);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	/* Release ownership of an unmapped wrapfd */
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-	close(wrapfd);
+-}
+-
+-static void test_rewrap(struct __test_metadata *_metadata,
+-			FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd, wrapfd2, wrapfd3;
+-	unsigned int state;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	ASSERT_TRUE(wrapfd_get_state(wrapfd, &state) == 0 &&
+-		    state == WRAPFD_CONTENT_RDONLY);
+-
+-	/* Try rewrapping unowned buffer */
+-	wrapfd2 = wrapfd_rewrap(wrapfd, PROT_WRITE);
+-	ASSERT_TRUE(wrapfd2 < 0 && errno == EBUSY);
+-
+-	/* Take buffer ownership */
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	/* Try rewrapping a mapped buffer */
+-	ptr = mmap(NULL, self->size, PROT_READ, MAP_SHARED | MAP_POPULATE,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	wrapfd2 = wrapfd_rewrap(wrapfd, PROT_WRITE);
+-	ASSERT_TRUE(wrapfd2 < 0 && errno == EINVAL);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	/* Rewrap the buffer to writable */
+-	wrapfd2 = wrapfd_rewrap(wrapfd, PROT_WRITE);
+-	ASSERT_TRUE(wrapfd2 >= 0);
+-
+-	/* Check the states of the new and original buffers */
+-	ASSERT_TRUE(wrapfd_get_state(wrapfd2, &state) == 0 &&
+-		    state == WRAPFD_CONTENT_RDWR);
+-	ASSERT_TRUE(wrapfd_get_state(wrapfd, &state) == 0 &&
+-		    state == WRAPFD_CONTENT_EMPTY);
+-
+-	/* Check rewrapped content */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd2, 0, 0, self->size), 0);
+-
+-	/* Take ownership of the rewrapped buffer */
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd2), 0);
+-
+-	/* Convert back to read-only */
+-	wrapfd3 = wrapfd_rewrap(wrapfd2, PROT_READ);
+-	ASSERT_TRUE(wrapfd3 >= 0);
+-	ASSERT_TRUE(wrapfd_get_state(wrapfd3, &state) == 0 &&
+-		    state == WRAPFD_CONTENT_RDONLY);
+-	ASSERT_TRUE(wrapfd_get_state(wrapfd2, &state) == 0 &&
+-		    state == WRAPFD_CONTENT_EMPTY);
+-
+-	/* Try mapping as writable */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd3, 0);
+-	ASSERT_TRUE(ptr == MAP_FAILED && errno == EACCES);
+-
+-	/* Check rewrapped content */
+-	ASSERT_EQ(cmp_content(_metadata, self, wrapfd3, 0, 0, self->size), 0);
+-
+-	/* Try mapping the original empty wrap file */
+-	ptr = mmap(NULL, self->size, PROT_READ, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_TRUE(ptr == MAP_FAILED && errno == ENOENT);
+-
+-	/* Release ownership of the buffers */
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd2), 0);
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-
+-	close(wrapfd3);
+-	close(wrapfd2);
+-	close(wrapfd);
+-}
+-
+-static void test_rewrap_rdonly_file(struct __test_metadata *_metadata,
+-				    FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	unsigned int state;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	ASSERT_EQ(wrapfd_get_state(wrapfd, &state), 0);
+-	ASSERT_EQ(state, WRAPFD_CONTENT_RDONLY);
+-
+-	/* Take buffer ownership */
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	/* Rewrapping the buffer as writable should fail. */
+-	ASSERT_TRUE(wrapfd_rewrap(wrapfd, PROT_WRITE) < 0 && errno == EACCES);
+-
+-	/* Mapping the buffer as writable should also fail. */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED, wrapfd, 0);
+-	ASSERT_TRUE(ptr == MAP_FAILED && errno == EACCES);
+-
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-
+-	close(wrapfd);
+-}
+-
+-static void test_empty(struct __test_metadata *_metadata,
+-		       FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	unsigned int state;
+-	int wrapfd;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Try emptying unowned buffer */
+-	ASSERT_TRUE(wrapfd_empty(wrapfd) < 0 && errno == EBUSY);
+-
+-	/* Take buffer ownership */
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	/* Try emptying a mapped buffer */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_TRUE(wrapfd_empty(wrapfd) < 0 && errno == EINVAL);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	/* Empty the buffer */
+-	ASSERT_EQ(wrapfd_empty(wrapfd), 0);
+-	ASSERT_TRUE(wrapfd_get_state(wrapfd, &state) == 0 &&
+-		    state == WRAPFD_CONTENT_EMPTY);
+-
+-	/* Try mapping the empty wrap file */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_TRUE(ptr == MAP_FAILED && errno == ENOENT);
+-
+-	/* Try loading into an empty wrap file. */
+-	ASSERT_TRUE(wrapfd_load(wrapfd, self->fd, 0, 0, self->size) < 0 && errno == ENOENT);
+-
+-	/* Release buffer ownership */
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-
+-	close(wrapfd);
+-}
+-
+-static int is_close_on_exec(int fd) {
+-	int flags;
+-
+-	flags = fcntl(fd, F_GETFD);
+-	if (flags == -1)
+-		return -1;
+-
+-	return (flags & FD_CLOEXEC) ? 1 : 0;
+-}
+-
+-static int set_close_on_exec(int fd, bool set) {
+-	int flags;
+-
+-	flags = fcntl(fd, F_GETFD);
+-	if (flags == -1)
+-		return -1;
+-
+-	if (set)
+-		flags |= FD_CLOEXEC;
+-	else
+-		flags &= ~FD_CLOEXEC;
+-
+-	return fcntl(fd, F_SETFD, flags);
+-}
+-
+-static void __test_close_on_exec(struct __test_metadata *_metadata,
+-				 FIXTURE_DATA(wrapfd_tests) *self,
+-				 int fd, int close_on_exec)
+-{
+-	int wrapfd, wrapfd2;
+-
+-	/* Wrap's attribute should match its content */
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-	ASSERT_EQ(close_on_exec, is_close_on_exec(wrapfd));
+-
+-	/* Rewrapping should preserve the attribute */
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-	wrapfd2 = wrapfd_rewrap(wrapfd, PROT_WRITE);
+-	ASSERT_TRUE(wrapfd2 >= 0);
+-	ASSERT_EQ(close_on_exec, is_close_on_exec(wrapfd2));
+-
+-	close(wrapfd2);
+-	close(wrapfd);
+-}
+-
+-static void test_close_on_exec(struct __test_metadata *_metadata,
+-			       FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int close_on_exec;
+-
+-	close_on_exec = is_close_on_exec(fd);
+-	ASSERT_NE(close_on_exec, -1);
+-
+-	/* Test FD_CLOEXEC inheritance */
+-	__test_close_on_exec(_metadata, self, fd, close_on_exec);
+-
+-	/* Test FD_CLOEXEC inheritance after toggling the attribute */
+-	set_close_on_exec(fd, !close_on_exec);
+-	__test_close_on_exec(_metadata, self, fd, !close_on_exec);
+-
+-	/* Reset attribute to the original value */
+-	set_close_on_exec(fd, close_on_exec);
+-}
+-
+-static void test_guests(struct __test_metadata *_metadata,
+-			FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-	char *ptr;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Try allowing guests for unowned buffer */
+-	ASSERT_TRUE(wrapfd_allow_guests(wrapfd) < 0 && errno == EBUSY);
+-
+-	/* Take buffer ownership */
+-	ASSERT_EQ(wrapfd_acquire_ownership(wrapfd), 0);
+-
+-	/* Try allowing guests for a mapped buffer */
+-	ptr = mmap(NULL, self->size, PROT_READ | PROT_WRITE, MAP_SHARED,
+-		   wrapfd, 0);
+-	ASSERT_NE(ptr, MAP_FAILED);
+-	ASSERT_TRUE(wrapfd_allow_guests(wrapfd) < 0 && errno == EINVAL);
+-	ASSERT_EQ(munmap(ptr, self->size), 0);
+-
+-	/* Allow guests */
+-	ASSERT_EQ(wrapfd_allow_guests(wrapfd), 0);
+-	ASSERT_EQ(wrapfd_prohibit_guests(wrapfd), 0);
+-	ASSERT_EQ(wrapfd_allow_guests(wrapfd), 0);
+-
+-	/* Release buffer ownership */
+-	ASSERT_EQ(wrapfd_release_ownership(wrapfd), 0);
+-
+-	close(wrapfd);
+-}
+-
+-#define FDINFO_BUF_SIZE	4096
+-
+-static void test_ioctl(struct __test_metadata *_metadata,
+-			FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	const char *buf_name = "test_dmabuf";
+-	char str[FDINFO_BUF_SIZE];
+-	char fdinfo_name[64];
+-	int fdinfo_fd;
+-	int wrapfd;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-	ASSERT_EQ(ioctl(wrapfd, DMA_BUF_SET_NAME, buf_name), 0);
+-
+-	/* Verify the dmabuf name is changed */
+-	sprintf(fdinfo_name, "/proc/%d/fdinfo/%d", getpid(), fd);
+-	fdinfo_fd = open(fdinfo_name, O_RDONLY);
+-	ASSERT_TRUE(fdinfo_fd >= 0);
+-	ASSERT_TRUE(read(fdinfo_fd, str, FDINFO_BUF_SIZE) > 0);
+-	ASSERT_NE(strstr(str, buf_name), NULL);
+-	close(fdinfo_fd);
+-
+-	/* Verify the dmabuf name is changed in wrapfd fdinfo too */
+-	sprintf(fdinfo_name, "/proc/%d/fdinfo/%d", getpid(), wrapfd);
+-	fdinfo_fd = open(fdinfo_name, O_RDONLY);
+-	ASSERT_TRUE(fdinfo_fd >= 0);
+-	ASSERT_TRUE(read(fdinfo_fd, str, FDINFO_BUF_SIZE) > 0);
+-	ASSERT_NE(strstr(str, buf_name), NULL);
+-	close(fdinfo_fd);
+-
+-	close(wrapfd);
+-}
+-
+-static void test_lseek(struct __test_metadata *_metadata,
+-		       FIXTURE_DATA(wrapfd_tests) *self, int fd)
+-{
+-	int wrapfd;
+-
+-	wrapfd = wrapfd_wrap(self->dev_fd, fd, PROT_READ | PROT_WRITE);
+-	ASSERT_TRUE(wrapfd >= 0);
+-
+-	/* Verify the dmabuf size is what we expect; dmabuf sizes are page aligned. */
+-	ASSERT_EQ(lseek(wrapfd, 0, SEEK_END), ALIGN(self->size, self->page_size));
+-	ASSERT_EQ(lseek(wrapfd, 0, SEEK_SET), 0);
+-
+-	close(wrapfd);
+-}
+-
+-
+-static void run_tests(struct __test_metadata *_metadata,
+-		      FIXTURE_DATA(wrapfd_tests) *self, int fd, int rdonly_fd)
+-{
+-	test_wrap(_metadata, self, fd);
+-	test_wrap_rdonly_file(_metadata, self, rdonly_fd);
+-	test_load_mapped(_metadata, self, fd);
+-	test_load_unmapped(_metadata, self, fd);
+-	test_load_rdonly_file(_metadata, self, rdonly_fd);
+-	test_wrap_rdonly(_metadata, self, fd);
+-	test_wrap_rdwr(_metadata, self, fd);
+-	test_remap_file_pages(_metadata, self, fd);
+-	test_wrap_remap(_metadata, self, fd);
+-	test_wrap_fork(_metadata, self, fd);
+-	test_dup(_metadata, self, fd);
+-	test_owner(_metadata, self, fd);
+-	test_rewrap(_metadata, self, fd);
+-	test_rewrap_rdonly_file(_metadata, self, rdonly_fd);
+-	test_empty(_metadata, self, fd);
+-	test_close_on_exec(_metadata, self, fd);
+-	test_guests(_metadata, self, fd);
+-	test_ioctl(_metadata, self, fd);
+-	test_lseek(_metadata, self, fd);
+-}
+-
+-TEST_F(wrapfd_tests, wrapfd_test_dmabuf_system_heap)
+-{
+-	int dmabuf_fd;
+-	int rdonly_dmabuf_fd;
+-	int heap_fd;
+-
+-	heap_fd = open("/dev/dma_heap/system", O_RDONLY);
+-	ASSERT_TRUE(heap_fd >= 0);
+-	dmabuf_fd = dmabuf_heap_alloc(heap_fd, self->size, O_RDWR);
+-	ASSERT_TRUE(dmabuf_fd >= 0);
+-	rdonly_dmabuf_fd = dmabuf_heap_alloc(heap_fd, self->size, O_RDONLY);
+-	ASSERT_TRUE(rdonly_dmabuf_fd >= 0);
+-	close(heap_fd);
+-	run_tests(_metadata, self, dmabuf_fd, rdonly_dmabuf_fd);
+-	close(rdonly_dmabuf_fd);
+-	close(dmabuf_fd);
+-}
+-
+-TEST_F(wrapfd_tests, wrapfd_test_dmabuf_cma_heap)
+-{
+-	int dmabuf_fd;
+-	int rdonly_dmabuf_fd;
+-	int heap_fd;
+-
+-	heap_fd = open("/dev/dma_heap/default_cma_region", O_RDONLY);
+-	if (heap_fd < 0 && errno == ENOENT)
+-		SKIP(return, "Skipping CMA tests as the CMA heap is missing");
+-	ASSERT_TRUE(heap_fd >= 0);
+-	dmabuf_fd = dmabuf_heap_alloc(heap_fd, self->size, O_RDWR);
+-	ASSERT_TRUE(dmabuf_fd >= 0);
+-	rdonly_dmabuf_fd = dmabuf_heap_alloc(heap_fd, self->size, O_RDONLY);
+-	ASSERT_TRUE(rdonly_dmabuf_fd >= 0);
+-	close(heap_fd);
+-	run_tests(_metadata, self, dmabuf_fd, rdonly_dmabuf_fd);
+-	close(rdonly_dmabuf_fd);
+-	close(dmabuf_fd);
+-}
+-
+-TEST_HARNESS_MAIN
 
 
