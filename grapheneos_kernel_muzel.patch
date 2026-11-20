@@ -1,44 +1,11 @@
 diff --git a//.gitignore b//.gitignore
-index c9c9d6877..a0e953a7b 100644
+index c2b0d2f26..b7418b6ea 100644
 --- a//.gitignore
 +++ b///.gitignore
-@@ -3,3 +3,4 @@ out/
- 
- device.bazelrc
- 
+@@ -8,3 +8,4 @@ device.bazelrc
+ /common/
+ /external/
+ /prebuilts/
 +EXTRA/
-diff --git a//private/devices/google/common/tools/build_dist.sh b//private/devices/google/common/tools/build_dist.sh
-index 01211c5d8..beb996111 100755
---- a//private/devices/google/common/tools/build_dist.sh
-+++ b///private/devices/google/common/tools/build_dist.sh
-@@ -27,5 +27,5 @@ trap '{ rm -f -- "$sign_file"; }' EXIT
- prebuilts/clang/host/linux-x86/clang-r510928/bin/clang aosp/scripts/sign-file.c -lssl -lcrypto -o ${sign_file}
- find out/${DEVICE}/dist -type f -name "*.ko" \
-   -exec ${sign_file} sha256 \
--  $(find out/ -type f -name "signing_key.pem") \
--  $(find out/ -type f -name "signing_key.x509") {} \;
-\ No newline at end of file
-+  $(find out/ -type f -name "signing_key.pem" | head -n1) \
-+  $(find out/ -type f -name "signing_key.x509" | head -n1) {} \;
-\ No newline at end of file
-
-
-diff --git a/aosp/drivers/usb/gadget/udc/core.c b/aosp/drivers/usb/gadget/udc/core.c
-index 1a43cb82cc71..8ee85be17c5c 100644
---- a/aosp/drivers/usb/gadget/udc/core.c
-+++ b/aosp/aosp/drivers/usb/gadget/udc/core.c
-@@ -716,12 +716,6 @@ static int usb_gadget_connect_locked(struct usb_gadget *gadget)
- 		goto out;
- 	}
- 
--	if (deny_new_usb) {
--		dev_err(&gadget->dev, "blocked USB gadget connection\n");
--		ret = -EPERM;
--		goto out;
--	}
--
- 	if (gadget->deactivated || !gadget->udc->allow_connect || !gadget->udc->started) {
- 		/*
- 		 * If the gadget isn't usable (because it is deactivated,
 
 

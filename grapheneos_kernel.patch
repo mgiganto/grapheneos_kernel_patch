@@ -2578,6 +2578,103 @@ index 600a7abe3736..b83357560f30 100644
  	slab_post_alloc_hook(s, objcg, flags, i, p, false);
  	kmem_cache_free_bulk(s, i, p);
  	return 0;
+diff --git a/aosp/net/ipv4/inet_connection_sock.c b/aosp/net/ipv4/inet_connection_sock.c
+index 5ef73eb8d843..7dce2e791b72 100644
+--- a/aosp/net/ipv4/inet_connection_sock.c
++++ b/aosp/aosp/net/ipv4/inet_connection_sock.c
+@@ -1105,14 +1105,10 @@ static void reqsk_timer_handler(struct timer_list *t)
+ 	 */
+ 	if (nreq) {
+ 		__NET_INC_STATS(net, LINUX_MIB_TCPMIGRATEREQFAILURE);
+-		/* The timer was not armed, drop its reference here. */
+-		reqsk_put(nreq);
+ no_ownership:
+ 		reqsk_migrate_reset(nreq);
+ 		reqsk_queue_removed(queue, nreq);
+-		/* Drop the temporary reference and the one reserved for ehash. */
+-		reqsk_put(nreq);
+-		reqsk_put(nreq);
++		__reqsk_free(nreq);
+ 	}
+ 
+ drop:
+@@ -1388,7 +1384,7 @@ struct sock *inet_csk_complete_hashdance(struct sock *sk, struct sock *child,
+ 
+ 			__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMIGRATEREQFAILURE);
+ 			reqsk_migrate_reset(nreq);
+-			reqsk_put(nreq);
++			__reqsk_free(nreq);
+ 		} else if (inet_csk_reqsk_queue_add(sk, req, child)) {
+ 			return child;
+ 		}
+@@ -1444,7 +1440,7 @@ void inet_csk_listen_stop(struct sock *sk)
+ 					__NET_INC_STATS(sock_net(nsk),
+ 							LINUX_MIB_TCPMIGRATEREQFAILURE);
+ 					reqsk_migrate_reset(nreq);
+-					reqsk_put(nreq);
++					__reqsk_free(nreq);
+ 				}
+ 				rcu_read_unlock();
+ 
+diff --git a/aosp/net/ipv4/inet_hashtables.c b/aosp/net/ipv4/inet_hashtables.c
+index d4fc6ad1e2d5..de0f16ae35b3 100644
+--- a/aosp/net/ipv4/inet_hashtables.c
++++ b/aosp/aosp/net/ipv4/inet_hashtables.c
+@@ -505,9 +505,8 @@ struct sock *__inet_lookup_established(struct net *net,
+ 		if (likely(inet_match(net, sk, acookie, ports, dif, sdif))) {
+ 			if (unlikely(!refcount_inc_not_zero(&sk->sk_refcnt)))
+ 				goto out;
+-			if (unlikely(hlist_nulls_unhashed_lockless(&sk->sk_nulls_node) ||
+-				     !inet_match(net, sk, acookie, ports, dif,
+-						 sdif))) {
++			if (unlikely(!inet_match(net, sk, acookie,
++						 ports, dif, sdif))) {
+ 				sock_gen_put(sk);
+ 				goto begin;
+ 			}
+diff --git a/aosp/net/ipv4/syncookies.c b/aosp/net/ipv4/syncookies.c
+index e917119e9fa9..f9514cf87649 100644
+--- a/aosp/net/ipv4/syncookies.c
++++ b/aosp/aosp/net/ipv4/syncookies.c
+@@ -215,8 +215,6 @@ struct sock *tcp_get_cookie_sock(struct sock *sk, struct sk_buff *skb,
+ 
+ 		bh_unlock_sock(child);
+ 		sock_put(child);
+-		reqsk_put(req);
+-		return NULL;
+ 	}
+ 	__reqsk_free(req);
+ 
+diff --git a/aosp/net/ipv4/tcp_input.c b/aosp/net/ipv4/tcp_input.c
+index a7eab8e22521..dc5c5b48a4f1 100644
+--- a/aosp/net/ipv4/tcp_input.c
++++ b/aosp/aosp/net/ipv4/tcp_input.c
+@@ -7138,9 +7138,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
+ 		if (!inet_csk_reqsk_queue_add(sk, req, fastopen_sk)) {
+ 			bh_unlock_sock(fastopen_sk);
+ 			sock_put(fastopen_sk);
+-			/* tcp_disconnect() already dropped one reqsk ref. */
+-			reqsk_put(req);
+-			goto drop;
++			goto drop_and_free;
+ 		}
+ 		READ_ONCE(sk->sk_data_ready)(sk);
+ 		bh_unlock_sock(fastopen_sk);
+diff --git a/aosp/net/ipv6/inet6_hashtables.c b/aosp/net/ipv6/inet6_hashtables.c
+index 402473c36888..3616225c89ef 100644
+--- a/aosp/net/ipv6/inet6_hashtables.c
++++ b/aosp/aosp/net/ipv6/inet6_hashtables.c
+@@ -75,9 +75,7 @@ struct sock *__inet6_lookup_established(struct net *net,
+ 		if (unlikely(!refcount_inc_not_zero(&sk->sk_refcnt)))
+ 			goto out;
+ 
+-		if (unlikely(hlist_nulls_unhashed_lockless(&sk->sk_nulls_node) ||
+-			     !inet6_match(net, sk, saddr, daddr, ports, dif,
+-					  sdif))) {
++		if (unlikely(!inet6_match(net, sk, saddr, daddr, ports, dif, sdif))) {
+ 			sock_gen_put(sk);
+ 			goto begin;
+ 		}
 diff --git a/aosp/sound/usb/endpoint.c b/aosp/sound/usb/endpoint.c
 index dbf2ed216592..cf6e9ec104c7 100644
 --- a/aosp/sound/usb/endpoint.c
