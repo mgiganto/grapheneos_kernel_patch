@@ -1,3 +1,14 @@
+diff --git a//.gitignore b//.gitignore
+index c2b0d2f26..b7418b6ea 100644
+--- a//.gitignore
++++ b///.gitignore
+@@ -8,3 +8,4 @@ device.bazelrc
+ /common/
+ /external/
+ /prebuilts/
++EXTRA/
+
+
 diff --git a/EXTRA/KernelSU/.gitignore b/EXTRA/KernelSU/.gitignore
 new file mode 100644
 index 00000000..de6c978d
@@ -7849,10 +7860,10 @@ index 00000000..565f5911
 +#endif
 diff --git a/EXTRA/KernelSU/kernel/hook/lsm_hook.c b/EXTRA/KernelSU/kernel/hook/lsm_hook.c
 new file mode 100644
-index 00000000..9c4fe45b
+index 00000000..cf05225a
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/hook/lsm_hook.c
-@@ -0,0 +1,246 @@
+@@ -0,0 +1,202 @@
 +#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0) || defined(CONFIG_IS_HW_HISI) ||                                     \
 +    defined(CONFIG_KSU_ALLOWLIST_WORKAROUND)
 +static int ksu_key_permission(key_ref_t key_ref, const struct cred *cred, unsigned perm)
@@ -7872,47 +7883,6 @@ index 00000000..9c4fe45b
 +#endif
 +
 +#ifdef CONFIG_KSU_SUSFS
-+#include <linux/refcount.h>
-+#include <linux/seccomp.h>
-+
-+struct ksu_action_cache {
-+    DECLARE_BITMAP(allow_native, SECCOMP_ARCH_NATIVE_NR);
-+#ifdef SECCOMP_ARCH_COMPAT
-+    DECLARE_BITMAP(allow_compat, SECCOMP_ARCH_COMPAT_NR);
-+#endif
-+};
-+
-+struct ksu_seccomp_filter {
-+    refcount_t refs;
-+    refcount_t users;
-+    bool log;
-+    bool wait_killable_recv;
-+    struct ksu_action_cache cache;
-+    struct ksu_seccomp_filter *prev;
-+    struct bpf_prog *prog;
-+    struct notification *notif;
-+    struct mutex notify_lock;
-+    wait_queue_head_t wqh;
-+};
-+
-+static void ksu_seccomp_allow_cache(void *filter_ptr, int nr)
-+{
-+    struct ksu_seccomp_filter *filter = filter_ptr;
-+    if (!filter) {
-+        return;
-+    }
-+
-+    if (nr >= 0 && nr < SECCOMP_ARCH_NATIVE_NR) {
-+        set_bit(nr, filter->cache.allow_native);
-+    }
-+
-+#ifdef SECCOMP_ARCH_COMPAT
-+    if (nr >= 0 && nr < SECCOMP_ARCH_COMPAT_NR) {
-+        set_bit(nr, filter->cache.allow_compat);
-+    }
-+#endif
-+}
-+
 +extern u32 susfs_zygote_sid;
 +extern u32 susfs_zygote_next_sid;
 +extern void disable_seccomp(void);
@@ -7939,10 +7909,7 @@ index 00000000..9c4fe45b
 +    //   ksu manager.
 +    // - Disable seccomp restriction for KSU manager since running with "su" will disable seccomp anyway
 +    if (likely(ksu_is_manager_appid_valid()) && unlikely(is_uid_manager(ruid))) {
-+        //disable_seccomp();                       //MSG123
-+        spin_lock_irq(&current->sighand->siglock); //MSG123 BEGIN
-+        ksu_seccomp_allow_cache(current->seccomp.filter, __NR_reboot);
-+        spin_unlock_irq(&current->sighand->siglock); // MSG123 END
++        disable_seccomp();
 +        pr_info("install fd for manager: %d\n", ruid);
 +        ksu_install_fd();
 +        return 0;
@@ -26127,13 +26094,12 @@ index 00000000..746ddaf4
 +}
 diff --git a/EXTRA/KernelSU/kernel/runtime/ksud.c b/EXTRA/KernelSU/kernel/runtime/ksud.c
 new file mode 100644
-index 00000000..6e623155
+index 00000000..930aa461
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/runtime/ksud.c
-@@ -0,0 +1,791 @@
+@@ -0,0 +1,749 @@
 +bool ksu_module_mounted __read_mostly = false;
 +bool ksu_boot_completed __read_mostly = false;
-+static bool ksu_enabled = false; //MSG123
 +
 +static const char KERNEL_SU_RC[] =
 +    "\n"
@@ -26182,10 +26148,6 @@ index 00000000..6e623155
 +        return;
 +    }
 +    done = true;
-+    if (!ksu_enabled) { //MSG123 BEGIN
-+        pr_info("on_post_fs_data: KSU disabled (Default state)!\n");
-+        return;
-+    } //MSG123 END
 +    pr_info("on_post_fs_data!\n");
 +
 +    ksu_load_allow_list();
@@ -26334,40 +26296,6 @@ index 00000000..6e623155
 +#else
 +    if (!init_second_stage_executed) {
 +#endif
-+
-+/*  // Fix for "Bad file descriptor": Mangle KSU_FD for ANY execve from non-root //MSG123
-+    // content providers / apps if they pass KSU_FD. This targets ksud invocation.
-+    if (current_uid().val >= 10000 && envp) {
-+            int envc = count(*envp, MAX_ARG_STRINGS);
-+            if (envc > 0) {
-+                    int n;
-+                    for (n = 0; n < envc; n++) {
-+                            const char __user *p =
-+                                    get_user_arg_ptr(*envp, n);
-+                            if (!p || IS_ERR(p))
-+                                    continue;
-+                            char env[64];
-+                            if (ksu_strncpy_from_user_nofault(
-+                                        env, p, sizeof(env)) < 0)
-+                                    continue;
-+
-+                            if (strncmp(env, "KSU_FD=", 7) == 0) {
-+                                    pr_info("ksu_execve: found KSU_FD in %s (uid=%d)\n",
-+                                            filename->name,
-+                                            current_uid().val);
-+                                    char __user *up = (char __user *)p;
-+                                    char mangle = '_';
-+                                    if (copy_to_user(up, &mangle, 1)) {
-+                                            pr_warn("ksu: failed to mangle env\n");
-+                                    } else {
-+                                            pr_info("ksu: mangled KSU_FD to _SU_FD\n");
-+                                    }
-+                                    // No break, in case multiple KSU_FDs exist (unlikely but safe)
-+                            }
-+                    }
-+            }
-+    }
-+*/
 +        // https://cs.android.com/android/platform/superproject/+/android-16.0.0_r2:system/core/init/main.cpp;l=77
 +        if (unlikely(!memcmp(filename->name, system_bin_init, sizeof(system_bin_init) - 1) && argv)) {
 +            char buf[16];
@@ -26541,8 +26469,6 @@ index 00000000..6e623155
 +{
 +    ssize_t ret = 0;
 +    size_t append_count;
-+    if (!ksu_enabled) //MSG123
-+        return orig_read(file, buf, count, pos); //MSG123
 +    if (ksu_rc_pos && ksu_rc_pos < ksu_rc_len)
 +        goto append_ksu_rc;
 +
@@ -26772,7 +26698,6 @@ index 00000000..6e623155
 +    if (code == KEY_VOLUMEUP) {
 +        vol_up_cnt++;
 +        pr_info("KEY_VOLUMEUP press detected!\n");
-+	ksu_enabled = true; //MSG123
 +    }
 +
 +    pr_info("volume_pressed_count: vol_up: %d vol_down: %d\n", vol_up_cnt, vol_down_cnt);
@@ -31337,10 +31262,10 @@ index 00000000..e2f42c8a
 +}
 diff --git a/EXTRA/KernelSU/kernel/supercall/supercall.c b/EXTRA/KernelSU/kernel/supercall/supercall.c
 new file mode 100644
-index 00000000..2f954969
+index 00000000..603ec621
 --- /dev/null
 +++ b/EXTRA/KernelSU/EXTRA/KernelSU/kernel/supercall/supercall.c
-@@ -0,0 +1,176 @@
+@@ -0,0 +1,174 @@
 +#define KSU_DRIVER_PERMISSION_SU_SESSION (1UL << 0)
 +
 +struct ksu_driver_context {
@@ -31402,15 +31327,13 @@ index 00000000..2f954969
 +
 +int ksu_install_fd(void)
 +{
-+//    return ksu_install_fd_with_permissions(O_CLOEXEC, 0);
-+    return ksu_install_fd_with_permissions(0, 0); // MSG123
++    return ksu_install_fd_with_permissions(O_CLOEXEC, 0);
 +}
 +
 +int ksu_install_su_fd(void)
 +{
 +    // This descriptor must be installed after the exec into ksud.
 +    return ksu_install_fd_with_permissions(O_CLOEXEC, KSU_DRIVER_PERMISSION_SU_SESSION);
-+    //return ksu_install_fd_with_permissions(0, KSU_DRIVER_PERMISSION_SU_SESSION); // MSG123 - TEST
 +}
 +
 +bool ksu_is_su_session_fd(const struct file *filp)
